@@ -4,341 +4,252 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>성적 평어 도우미</title>
-<meta name="description" content="성취기준별 상·중·하를 누르면 학생별 교과 평어가 만들어집니다. 학생 이름 없이 번호로만, 브라우저 안에서만 처리합니다.">
+<meta name="description" content="6학년 2학기 평가계획의 성취기준별 ◎○△를 누르면 담임이 쓴 것 같은 교과 평어가 반 안에서 겹치지 않게 만들어집니다.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 :root{
-  --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --sub:#5d6670; --line:#e3e6ea;
-  --accent:#2f6fde; --accent-soft:#e8f0fd; --warn:#c2410c; --warn-soft:#fff3ea;
-  --l0:#2f6fde; --l1:#16a34a; --l2:#d97706; --l3:#dc2626;
+  --bg:#f5f6f8; --card:#fff; --ink:#1b1f24; --sub:#5f6873; --line:#e2e5e9; --soft:#f0f2f5;
+  --accent:#2f6fde; --accent-soft:#e9f0fd; --warn:#c2410c;
+  --l0:#2563eb; --l1:#16a34a; --l2:#d97706;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#111418; --card:#1a1e24; --ink:#e7eaee; --sub:#9aa3ad; --line:#2b3139;
-    --accent:#6ea0ff; --accent-soft:#1c2a44; --warn:#fb923c; --warn-soft:#2c1d12;
+    --bg:#111418; --card:#1a1e24; --ink:#e7eaee; --sub:#9aa3ad; --line:#2b3139; --soft:#20252c;
+    --accent:#6ea0ff; --accent-soft:#1c2a44; --warn:#fb923c;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#111418; --card:#1a1e24; --ink:#e7eaee; --sub:#9aa3ad; --line:#2b3139;
-  --accent:#6ea0ff; --accent-soft:#1c2a44; --warn:#fb923c; --warn-soft:#2c1d12;
+  --bg:#111418; --card:#1a1e24; --ink:#e7eaee; --sub:#9aa3ad; --line:#2b3139; --soft:#20252c;
+  --accent:#6ea0ff; --accent-soft:#1c2a44; --warn:#fb923c;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,system-ui,-apple-system,"Malgun Gothic",sans-serif;font-size:15px;line-height:1.5}
-header{max-width:1200px;margin:0 auto;padding:24px 16px 8px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
-h1{margin:0;font-size:24px;letter-spacing:-.02em}
-.lead{margin:4px 0 0;color:var(--sub);font-size:14px}
-main{max-width:1200px;margin:0 auto;padding:8px 16px 80px}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 16px}
-.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,system-ui,-apple-system,"Malgun Gothic",sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1320px;margin:0 auto;padding:0 16px}
+header{padding:22px 0 10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+h1{margin:0;font-size:22px;letter-spacing:-.02em}
+h1 small{font-size:14px;color:var(--sub);font-weight:500;margin-left:6px}
+.cls{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:15px;flex-wrap:wrap}
+.cls input{width:58px;font:inherit;text-align:center;padding:6px 4px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.cls b{font-weight:700}
+.safe{font-size:12px;color:var(--sub)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;padding:6px 0 14px;position:sticky;top:0;background:var(--bg);z-index:5}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px}
 .tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
-.tab .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6;margin-left:6px;vertical-align:middle}
-section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
-.step{display:flex;align-items:center;gap:10px;margin:0 0 12px}
-.step b{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:14px;flex:none}
-.step h2{margin:0;font-size:17px}
-.step .right{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
-.hint{color:var(--sub);font-size:13px;margin:0 0 10px}
-textarea,input[type=text],input[type=number]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
-textarea{resize:vertical}
+.tab .cnt{font-size:12px;opacity:.75;margin-left:4px}
+.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.bar .note{font-size:13px;color:var(--sub)}
+.bar .right{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
 button.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
 button.btn:hover{border-color:var(--accent)}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button.ghost{border-color:transparent;background:transparent;color:var(--sub)}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.items{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
-.items th,.items td{border-top:1px solid var(--line);padding:6px;vertical-align:top;text-align:left}
-.items th{color:var(--sub);font-weight:600;font-size:13px}
-.items textarea{min-height:38px;padding:6px 8px;font-size:13px}
-.items td.del{width:32px}
-.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-table.grid{border-collapse:separate;border-spacing:0;font-size:14px;min-width:100%}
-.grid th,.grid td{border-bottom:1px solid var(--line);padding:6px 8px;background:var(--card);text-align:center;white-space:nowrap}
-.grid thead th{position:sticky;top:0;z-index:2;font-size:13px;font-weight:600;max-width:180px;white-space:normal;vertical-align:bottom}
-.grid thead th .nm{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.grid th:first-child,.grid td:first-child{position:sticky;left:0;z-index:1;font-weight:700}
-.grid thead th:first-child{z-index:3}
-.grid tr.all td{background:var(--accent-soft);font-size:12px;color:var(--sub)}
-.grid tr.all td:first-child{background:var(--accent-soft)}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{font:inherit;font-size:13px;border:0;border-left:1px solid var(--line);background:transparent;color:var(--sub);padding:5px 9px;cursor:pointer;min-width:34px}
+button.small{font-size:12px;padding:4px 8px}
+details.std{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:10px}
+details.std summary{cursor:pointer;font-size:13px;color:var(--sub)}
+.stdlist{display:grid;gap:10px;margin-top:10px;font-size:13px}
+.stdlist .code{font-weight:700;color:var(--accent)}
+.stdlist ol{margin:4px 0 0;padding-left:0;list-style:none}
+.stdlist li{color:var(--sub)}
+.scroll{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px}
+table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
+.g th,.g td{border-bottom:1px solid var(--line);padding:8px;vertical-align:middle;background:var(--card)}
+.g thead th{font-size:12px;color:var(--sub);font-weight:600;text-align:center;white-space:nowrap;position:sticky;top:0}
+.g thead th.code span{display:block;font-size:11px;font-weight:500;max-width:130px;overflow:hidden;text-overflow:ellipsis;margin:0 auto}
+.g td.no{font-weight:700;text-align:center;width:46px;position:sticky;left:0;z-index:1}
+.g td.lv{text-align:center;white-space:nowrap;width:1%}
+.g td.txt{min-width:340px}
+.g td.act{white-space:nowrap;width:1%;text-align:right}
+.g tr.all td{background:var(--accent-soft)}
+.g tr.all td.no{font-size:12px;color:var(--sub)}
+.g tr.all td.txt{font-size:12px;color:var(--sub)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{font:inherit;font-size:15px;border:0;border-left:1px solid var(--line);background:transparent;color:var(--sub);width:32px;height:30px;cursor:pointer;padding:0}
 .seg button:first-child{border-left:0}
 .seg button.on{color:#fff}
-.seg button.on.l0{background:var(--l0)} .seg button.on.l1{background:var(--l1)} .seg button.on.l2{background:var(--l2)} .seg button.on.l3{background:var(--l3)}
-.grid td.extra input{min-width:160px;padding:5px 8px;font-size:13px}
-.results{display:grid;gap:8px}
-.res{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:start;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-.res .no{font-weight:700;color:var(--accent)}
-.res .txt{white-space:pre-wrap;word-break:keep-all}
-.res .meta{font-size:12px;color:var(--sub);margin-top:4px}
-.res .meta .w{color:var(--warn)}
-.res.empty .txt{color:var(--sub)}
-.empty-note{color:var(--sub);text-align:center;padding:24px;border:1px dashed var(--line);border-radius:10px}
+.seg button.on.l0{background:var(--l0)} .seg button.on.l1{background:var(--l1)} .seg button.on.l2{background:var(--l2)}
+.t{white-space:pre-wrap;word-break:keep-all}
+.t.empty{color:var(--sub);font-size:13px}
+.meta{font-size:12px;color:var(--sub);margin-top:3px}
+.meta .w{color:var(--warn)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none;font-size:14px;z-index:9}
 .toast.show{opacity:1;transform:translateX(-50%)}
-.safe{font-size:12px;color:var(--sub);background:var(--accent-soft);border-radius:8px;padding:6px 10px}
-details summary{cursor:pointer;color:var(--sub);font-size:13px}
-@media (max-width:640px){
-  .res{grid-template-columns:32px 1fr}
-  .res .acts{grid-column:2}
-  h1{font-size:20px}
-}
+.guide{font-size:13px;color:var(--sub);margin:14px 0 40px;line-height:1.7}
+@media (max-width:640px){ h1{font-size:19px} .cls{margin-left:0} .g td.txt{min-width:260px} }
 </style>
 </head>
 <body>
-<header>
-  <div>
-    <h1>성적 평어 도우미</h1>
-    <p class="lead">성취기준별로 상·중·하만 누르면 학생별 교과 평어가 만들어져요.</p>
+<div class="wrap">
+  <header>
+    <h1>성적 평어 도우미<small>6학년 2학기</small></h1>
+    <div class="cls">
+      <b>6학년</b><input type="number" id="cls" min="1" max="20" aria-label="반"><b>반</b>
+      <span style="width:6px"></span>
+      학생<input type="number" id="num" min="1" max="40" aria-label="학생 수">명
+    </div>
+  </header>
+  <div class="safe">학생 이름은 받지 않아요. 고른 것은 이 컴퓨터 브라우저에만 저장돼요.</div>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <div class="bar">
+    <span class="note" id="status"></span>
+    <div class="right">
+      <button class="btn" id="copyTsv">엑셀용 복사</button>
+      <button class="btn primary" id="copyAll">이 과목 전체 복사</button>
+    </div>
   </div>
-  <span class="safe">학생 이름 없이 번호만 · 이 컴퓨터 브라우저에만 저장</span>
-</header>
 
-<main>
-  <div class="tabs" id="tabs"></div>
+  <details class="std" id="stdBox"><summary>이 과목 성취기준·평가기준 보기</summary><div class="stdlist" id="stdList"></div></details>
 
-  <section class="card" id="s1">
-    <div class="step"><b>1</b><h2>성취기준과 평어 넣기</h2>
-      <div class="right">
-        <button class="btn ghost" id="sampleBtn">예시 넣기</button>
-        <button class="btn ghost" id="exportBtn">설정 파일 저장</button>
-        <button class="btn ghost" id="importBtn">설정 파일 열기</button>
-        <input type="file" id="importFile" accept=".json" hidden>
-      </div>
-    </div>
-    <p class="hint">나이스에서 받은 엑셀이나 평가계획 표에서 <b>성취기준 | 상 | 중 | 하</b> 칸을 드래그해 복사한 뒤 아래에 붙여 넣으세요. 맨 윗줄이 "상·중·하"나 "잘함·보통·노력요함" 같은 제목이면 그 이름을 그대로 써요.</p>
-    <textarea id="paste" rows="4" placeholder="여기에 붙여 넣기 (Ctrl+V)&#10;예) 작품 속 인물의 마음 짐작하기	인물의 마음을 근거를 들어 깊이 있게 짐작함.	인물의 마음을 짐작함.	도움을 받아 인물의 마음을 짐작함."></textarea>
-    <div class="row" style="margin-top:8px">
-      <button class="btn primary" id="parseBtn">표 읽기</button>
-      <button class="btn" id="addItemBtn">성취기준 한 줄 추가</button>
-      <span class="hint" id="parseMsg" style="margin:0"></span>
-    </div>
-    <div id="itemsWrap"></div>
-  </section>
+  <div class="scroll"><table class="g" id="grid"></table></div>
 
-  <section class="card" id="s2">
-    <div class="step"><b>2</b><h2>학생마다 누르기</h2>
-      <div class="right row">
-        <label class="hint" style="margin:0">학생 수</label>
-        <input type="number" id="nStudents" min="1" max="40" style="width:80px">
-        <button class="btn ghost" id="clearMarks">이 과목 선택 지우기</button>
-      </div>
-    </div>
-    <p class="hint">파란 줄의 버튼은 그 성취기준을 학생 전체에 한꺼번에 넣어요. 대부분 "중"으로 채운 뒤 다른 학생만 바꾸면 빨라요.</p>
-    <div id="gridWrap"></div>
-  </section>
-
-  <section class="card" id="s3">
-    <div class="step"><b>3</b><h2>평어 복사하기</h2>
-      <div class="right">
-        <button class="btn" id="copyTsv">엑셀용 전체 복사</button>
-        <button class="btn primary" id="copyAll">전체 복사</button>
-      </div>
-    </div>
-    <p class="hint">나이스 <b>학기말 종합의견</b>에 넣고 2학기에 체크한 뒤 일괄저장하세요 (교과학습발달상황에 바로 넣으면 2학기 성적이 빠진 것으로 나와요). 바이트는 나이스 방식(한글 3, 영문·숫자·공백 1, 줄바꿈 2)으로 셌어요.</p>
-    <div class="results" id="results"></div>
-  </section>
-
-  <details>
-    <summary>이 도구에 대해</summary>
-    <p class="hint" style="margin-top:8px">학생 이름은 받지 않아요. 넣은 내용은 서버로 가지 않고 이 브라우저(localStorage)에만 저장돼요. 다른 컴퓨터에서 이어 하거나 같은 학년 선생님께 성취기준을 나눠 드리려면 "설정 파일 저장"으로 파일을 만들어 보내세요. 선택한 상·중·하는 파일에 넣지 않아요.</p>
-  </details>
-</main>
+  <p class="guide">
+    ◎○△를 누르면 평어가 바로 만들어져요. 같은 반에서 평어가 똑같은 학생은 생기지 않게 문장을 골라 줘요. 마음에 안 들면 <b>다른 문장</b>을 누르세요.<br>
+    나이스 <b>학기말 종합의견</b>에 넣고 2학기에 체크한 뒤 일괄저장하세요 (교과학습발달상황에 바로 넣으면 2학기 성적이 빠진 것으로 나와요). 바이트는 나이스 방식(한글 3, 영문·숫자·공백 1)으로 셌어요.
+  </p>
+</div>
 <div class="toast" id="toast"></div>
 
+<script src="data/g6-2.js?v=2"></script>
 <script>
-const SUBJECTS = ['국어','수학','사회','과학','영어','도덕','실과','체육','음악','미술'];
-const KEY = 'pyeongeo-helper-v1';
-const LEVEL_WORDS = ['상','중','하','매우잘함','매우 잘함','잘함','보통','노력요함','노력 요함','우수','미흡','A','B','C','D'];
-const DEFAULT_LEVELS = {2:['잘함','노력요함'],3:['상','중','하'],4:['매우잘함','잘함','보통','노력요함']};
-
-let state = load() || { students: 24, current: '국어', subjects: {} };
-function sub(){ const s = state.current; if(!state.subjects[s]) state.subjects[s] = {levels:['상','중','하'], items:[], marks:{}, extra:{}}; return state.subjects[s]; }
-function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+const D = window.PY_DATA;
+const LV = ['◎','○','△'];
+const KEY = 'pyeongeo-g6-2';
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),1600); }
 
-/* ---------- 탭 ---------- */
+let S = load() || {cls:1, num:25, subj:D.subjects[0].name, marks:{}, salt:{}};
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),1600); }
+const subj = () => D.subjects.find(s => s.name===S.subj) || D.subjects[0];
+function marks(n){ const s=subj(); S.marks[s.name] ||= {}; const m = S.marks[s.name][n] ||= []; while(m.length<s.items.length) m.push(-1); return m; }
+function saltOf(n){ return ((S.salt[subj().name]||{})[n])||0; }
+
+/* ---- 섞기 (반·과목마다 같은 결과) ---- */
+function hash(str){ let h=2166136261; for(const c of str){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; }
+function rng(seed){ return () => { seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function perm(n, key){ const r=rng(hash(key)); const a=[...Array(n).keys()]; for(let i=n-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* ---- 문장 배정: 같은 성취기준·수준끼리 돌려 쓰고, 평어 전체는 반 안에서 겹치지 않게 ---- */
+function assign(){
+  const s=subj(), N=S.num, K=s.items.length;
+  const pick = {}; // pick[n][i] = 버전 번호
+  const use = s.items.map(it => it.v.map(arr => new Array(arr.length).fill(0)));
+  // 1) 기본 배정
+  s.items.forEach((it,i) => {
+    [0,1,2].forEach(L => {
+      const V = it.v[L].length, p = perm(V, `${S.cls}|${s.name}|${i}|${L}`);
+      let k=0;
+      // 한 바퀴(V명)를 돌 때마다 성취기준마다 다른 폭으로 밀어서, 1번과 11번이 같은 문장 묶음을 받지 않게 함
+      for(let n=1;n<=N;n++){ if(marks(n)[i]===L){ (pick[n] ||= [])[i] = p[(k + Math.floor(k / V) * (i + 1)) % V]; k++; } }
+    });
+  });
+  for(let n=1;n<=N;n++){ pick[n] ||= []; }
+  const count = () => { use.forEach(a=>a.forEach(b=>b.fill(0))); for(let n=1;n<=N;n++){ const m=marks(n); for(let i=0;i<K;i++) if(m[i]>=0) use[i][m[i]][pick[n][i]]++; } };
+  // 2) "다른 문장"을 누른 학생: 덜 쓰인 버전으로 돌림
+  count();
+  for(let n=1;n<=N;n++){
+    const sl = saltOf(n); if(!sl) continue;
+    const m = marks(n);
+    for(let i=0;i<K;i++){
+      if(m[i]<0) continue;
+      const L=m[i], V=s.items[i].v[L].length, base=pick[n][i];
+      use[i][L][base]--;
+      const p = perm(V, `${S.cls}|${s.name}|${i}|${L}|alt`);
+      const cand = p.filter(v => v!==base).sort((a,b) => use[i][L][a]-use[i][L][b]);
+      pick[n][i] = cand[(sl-1+i) % cand.length];
+      use[i][L][pick[n][i]]++;
+    }
+  }
+  // 3) 평어 전체가 같은 학생이 있으면 밀어 내기
+  const seen = new Map();
+  for(let n=1;n<=N;n++){
+    const m=marks(n); if(m.every(x=>x<0)) continue;
+    let key = pick[n].map((v,i)=>m[i]<0?'-':m[i]+':'+v).join('|');
+    if(seen.has(key)){
+      let fixed=false;
+      outer: for(let i=0;i<K;i++){
+        if(m[i]<0) continue;
+        const L=m[i], V=s.items[i].v[L].length;
+        const order=[...Array(V).keys()].sort((a,b)=>use[i][L][a]-use[i][L][b]);
+        for(const v of order){
+          const old=pick[n][i]; pick[n][i]=v;
+          const k2 = pick[n].map((vv,j)=>m[j]<0?'-':m[j]+':'+vv).join('|');
+          if(!seen.has(k2)){ use[i][L][old]--; use[i][L][v]++; key=k2; fixed=true; break outer; }
+          pick[n][i]=old;
+        }
+      }
+      if(!fixed){ /* 버전이 모자라는 극단적인 경우 — 그대로 둠 */ }
+    }
+    seen.set(key, n);
+  }
+  count();
+  return {pick, use};
+}
+function textOf(n, pick){
+  const s=subj(), m=marks(n);
+  return s.items.map((it,i) => m[i]>=0 ? it.v[m[i]][pick[n][i]] : '').filter(Boolean).join(' ');
+}
+function neisBytes(t){ let b=0; for(const ch of t){ b += ch==='\n'?2:(ch.charCodeAt(0)<128?1:3); } return b; }
+
+/* ---- 그리기 ---- */
 function renderTabs(){
-  const names = [...new Set([...SUBJECTS, ...Object.keys(state.subjects)])];
-  $('tabs').innerHTML = names.map(n => {
-    const has = state.subjects[n] && state.subjects[n].items.length;
-    return `<button class="tab ${n===state.current?'on':''}" data-s="${esc(n)}">${esc(n)}${has?'<span class="dot"></span>':''}</button>`;
-  }).join('') + `<button class="tab" id="addSubject">+ 과목</button>`;
-  $('tabs').querySelectorAll('[data-s]').forEach(b => b.onclick = () => { state.current = b.dataset.s; save(); renderAll(); });
-  $('addSubject').onclick = () => {
-    const box = document.createElement('input'); box.type='text'; box.placeholder='과목 이름 입력 후 Enter'; box.style.width='180px';
-    $('addSubject').replaceWith(box); box.focus();
-    box.onkeydown = e => { if(e.key==='Enter' && box.value.trim()){ state.current = box.value.trim(); sub(); save(); renderAll(); } if(e.key==='Escape') renderTabs(); };
-    box.onblur = () => setTimeout(renderTabs, 150);
-  };
+  $('tabs').innerHTML = D.subjects.map(s => {
+    const all = S.marks[s.name] || {}; let done=0;
+    for(let n=1;n<=S.num;n++){ const m=all[n]; if(m && m.length>=s.items.length && m.slice(0,s.items.length).every(x=>x>=0)) done++; }
+    return `<button class="tab ${s.name===S.subj?'on':''}" data-s="${esc(s.name)}">${esc(s.name)}<span class="cnt">${done?done+'/'+S.num:''}</span></button>`;
+  }).join('');
+  $('tabs').querySelectorAll('[data-s]').forEach(b => b.onclick = () => { S.subj=b.dataset.s; save(); render(); });
 }
-
-/* ---------- 1. 붙여넣기 읽기 ---------- */
-function parseTSV(text){
-  const rows=[]; let row=[], cell='', q=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-    if(q){ if(c==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=c; }
-    else if(c==='"' && cell==='') q=true;
-    else if(c==='\t'){ row.push(cell); cell=''; }
-    else if(c==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; }
-    else if(c==='\r'){}
-    else cell+=c;
-  }
-  row.push(cell); rows.push(row);
-  return rows.map(r => r.map(c => c.trim())).filter(r => r.some(c => c));
+function renderStd(){
+  const s=subj();
+  $('stdList').innerHTML = s.items.map(it => `<div><span class="code">[${esc(it.code)}]</span> ${esc(it.std)}<ol>${it.c.map((c,k)=>`<li>${LV[k]} ${esc(c)}</li>`).join('')}</ol></div>`).join('');
 }
-function isLevelWord(s){ const t=s.replace(/\s/g,''); return LEVEL_WORDS.some(w => w.replace(/\s/g,'')===t) || /^(상|중|하)\s*(평어|기준)?$/.test(s); }
-function parsePaste(){
-  const raw = $('paste').value;
-  if(!raw.trim()){ $('parseMsg').textContent = '붙여 넣은 내용이 없어요.'; return; }
-  let rows = parseTSV(raw);
-  if(rows.every(r => r.length===1)){ rows = rows.map(r => r[0].split(/\s*\|\s*/)); }
-  let levels = null;
-  const first = rows[0];
-  const tailHead = first.slice(1).filter(c => c);
-  if(tailHead.length>=2 && tailHead.every(isLevelWord)){ levels = tailHead.map(s => s.replace(/\s*(평어|기준)$/,'')); rows = rows.slice(1); }
-  else if(first.length>=3 && first.slice(-3).every(isLevelWord)){ levels = first.slice(-3); rows = rows.slice(1); }
-  rows = rows.filter(r => r.filter(c=>c).length>=2);
-  if(!rows.length){ $('parseMsg').textContent = '성취기준과 평어가 같은 줄에 2칸 이상 있어야 해요. 엑셀에서 칸째로 복사해 주세요.'; return; }
-  if(!levels){
-    const counts={}; rows.forEach(r => { const n=Math.min(4,Math.max(2,r.length-1)); counts[n]=(counts[n]||0)+1; });
-    const L = +Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
-    levels = DEFAULT_LEVELS[L];
-  }
-  const L = levels.length;
-  const items = rows.map(r => {
-    const texts = r.slice(-L); while(texts.length<L) texts.unshift('');
-    const name = r.slice(0, Math.max(1, r.length-L)).filter(c=>c).join(' · ') || '(이름 없음)';
-    return {name, texts};
-  });
-  const s = sub();
-  const keepMarks = s.items.length===0 || confirmReplace(s);
-  if(!keepMarks) return;
-  s.levels = levels; s.items = items; s.marks = {};
-  save(); $('paste').value=''; $('parseMsg').textContent = `성취기준 ${items.length}개, 수준 ${L}단계(${levels.join('·')})로 읽었어요.`;
-  renderAll();
-}
-let replaceArmed = false;
-function confirmReplace(s){
-  if(replaceArmed){ replaceArmed=false; return true; }
-  replaceArmed = true; $('parseMsg').textContent = '이미 성취기준이 있어요. 바꾸려면 "표 읽기"를 한 번 더 누르세요 (고른 상·중·하는 지워져요).';
-  setTimeout(()=>replaceArmed=false, 6000); return false;
-}
-function renderItems(){
-  const s = sub();
-  if(!s.items.length){ $('itemsWrap').innerHTML = ''; return; }
-  $('itemsWrap').innerHTML = `<div style="overflow-x:auto"><table class="items" style="min-width:560px"><thead><tr><th style="width:22%">성취기준</th>${s.levels.map((l,i)=>`<th><input type="text" value="${esc(l)}" data-lv="${i}" style="padding:3px 6px;font-size:13px;width:110px"></th>`).join('')}<th></th></tr></thead><tbody>${
-    s.items.map((it,i)=>`<tr><td><textarea data-i="${i}" data-f="name">${esc(it.name)}</textarea></td>${it.texts.map((t,j)=>`<td><textarea data-i="${i}" data-f="${j}">${esc(t)}</textarea></td>`).join('')}<td class="del"><button class="btn ghost" data-del="${i}" title="이 줄 지우기">✕</button></td></tr>`).join('')
-  }</tbody></table></div>`;
-  $('itemsWrap').querySelectorAll('textarea').forEach(ta => ta.oninput = () => {
-    const it = s.items[+ta.dataset.i];
-    if(ta.dataset.f==='name') it.name = ta.value; else it.texts[+ta.dataset.f] = ta.value;
-    save(); renderGridHead(); renderResults();
-  });
-  $('itemsWrap').querySelectorAll('[data-lv]').forEach(inp => inp.oninput = () => { s.levels[+inp.dataset.lv] = inp.value; save(); renderGrid(); });
-  $('itemsWrap').querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
-    const i=+b.dataset.del; s.items.splice(i,1);
-    Object.values(s.marks).forEach(m => m.splice(i,1));
-    save(); renderAll();
-  });
-}
-
-/* ---------- 2. 표 ---------- */
-function marksOf(n){ const s=sub(); if(!s.marks[n]) s.marks[n] = s.items.map(()=>-1); while(s.marks[n].length<s.items.length) s.marks[n].push(-1); return s.marks[n]; }
-function segHTML(level, picked, attrs){
-  return `<span class="seg">${sub().levels.map((l,k)=>`<button class="${picked===k?'on l'+k:''}" ${attrs} data-k="${k}">${esc(shortLv(l))}</button>`).join('')}</span>`;
-}
-function shortLv(l){ return ({'매우잘함':'매우','매우 잘함':'매우','노력요함':'노력','노력 요함':'노력'})[l] || l; }
-function renderGridHead(){
-  const s=sub(); document.querySelectorAll('.grid thead th[data-h]').forEach(th => { const it=s.items[+th.dataset.h]; if(it){ th.querySelector('.nm').textContent=it.name; th.title=it.name; } });
-}
-function renderGrid(){
-  const s=sub(), N=state.students;
-  if(!s.items.length){ $('gridWrap').innerHTML = `<div class="empty-note">1단계에서 성취기준을 먼저 넣어 주세요.</div>`; return; }
-  let h = `<div class="scroll"><table class="grid"><thead><tr><th>번호</th>${s.items.map((it,i)=>`<th data-h="${i}" title="${esc(it.name)}"><span class="nm">${esc(it.name)}</span></th>`).join('')}<th>덧붙일 말 (선택)</th></tr></thead><tbody>`;
-  h += `<tr class="all"><td>전체</td>${s.items.map((_,i)=>`<td>${segHTML(null,-1,`data-all="${i}"`)}</td>`).join('')}<td></td></tr>`;
+function segHTML(picked, attrs){ return `<span class="seg">${LV.map((l,k)=>`<button class="${picked===k?'on l'+k:''}" ${attrs} data-k="${k}" title="${l}">${l}</button>`).join('')}</span>`; }
+function render(){
+  $('cls').value=S.cls; $('num').value=S.num;
+  renderTabs(); renderStd();
+  const s=subj(), N=S.num, {pick, use}=assign();
+  let h = `<thead><tr><th>번호</th>${s.items.map(it=>`<th class="code" title="${esc(it.std)}">${esc(it.code)}<span>${esc(it.area)}</span></th>`).join('')}<th style="text-align:left">평어</th><th></th></tr></thead><tbody>`;
+  h += `<tr class="all"><td class="no">전체</td>${s.items.map((_,i)=>`<td class="lv">${segHTML(-1,`data-all="${i}"`)}</td>`).join('')}<td class="txt">누르면 그 성취기준을 반 전체에 넣어요. 대부분 ○로 채우고 다른 학생만 바꾸면 빨라요.</td><td></td></tr>`;
   for(let n=1;n<=N;n++){
-    const m = marksOf(n);
-    h += `<tr><td>${n}</td>${s.items.map((_,i)=>`<td>${segHTML(null,m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}<td class="extra"><input type="text" data-x="${n}" value="${esc(s.extra[n]||'')}" placeholder="예: 발표를 자신 있게 함."></td></tr>`;
+    const m=marks(n), t=textOf(n,pick), miss=m.filter(x=>x<0).length;
+    h += `<tr><td class="no">${n}</td>${s.items.map((_,i)=>`<td class="lv">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
+      <td class="txt"><div class="t ${t?'':'empty'}">${t?esc(t):'◎○△를 누르세요'}</div>${t?`<div class="meta">${t.length}자 · ${neisBytes(t)}바이트${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`:''}</td>
+      <td class="act">${t?`<button class="btn small" data-alt="${n}">다른 문장</button> <button class="btn small" data-copy="${n}">복사</button>`:''}</td></tr>`;
   }
-  h += `</tbody></table></div>`;
-  $('gridWrap').innerHTML = h;
-  $('gridWrap').querySelectorAll('button[data-n]').forEach(b => b.onclick = () => {
-    const m = marksOf(+b.dataset.n), i=+b.dataset.i, k=+b.dataset.k;
-    m[i] = m[i]===k ? -1 : k; save();
-    b.parentNode.querySelectorAll('button').forEach(x => { const kk=+x.dataset.k; x.className = m[i]===kk ? 'on l'+kk : ''; });
-    renderResults(); renderTabs();
+  h += `</tbody>`;
+  $('grid').innerHTML = h;
+  let filled=0; for(let n=1;n<=N;n++) if(textOf(n,pick)) filled++;
+  $('status').innerHTML = `${esc(s.name)} · 성취기준 ${s.items.length}개 · 평어 ${filled}/${N}명` + (filled>1?' · 반 안에서 모두 서로 달라요':'');
+  bind(pick);
+}
+function bind(pick){
+  const s=subj();
+  $('grid').querySelectorAll('button[data-n]').forEach(b => b.onclick = () => {
+    const m=marks(+b.dataset.n), i=+b.dataset.i, k=+b.dataset.k;
+    m[i] = m[i]===k ? -1 : k; save(); render();
   });
-  $('gridWrap').querySelectorAll('button[data-all]').forEach(b => b.onclick = () => {
+  $('grid').querySelectorAll('button[data-all]').forEach(b => b.onclick = () => {
     const i=+b.dataset.all, k=+b.dataset.k;
-    for(let n=1;n<=N;n++) marksOf(n)[i]=k;
-    save(); renderGrid(); renderResults(); toast(`전체 학생에게 "${sub().levels[k]}"을 넣었어요`);
+    for(let n=1;n<=S.num;n++) marks(n)[i]=k;
+    save(); render(); toast(`${s.items[i].code} 전체를 ${LV[k]}로 넣었어요`);
   });
-  $('gridWrap').querySelectorAll('input[data-x]').forEach(inp => inp.oninput = () => { s.extra[inp.dataset.x] = inp.value; save(); renderResults(); });
-}
-
-/* ---------- 3. 결과 ---------- */
-function sentence(t){ t=t.trim(); if(!t) return ''; return /[.!?。]$/.test(t) ? t : t+'.'; }
-function textFor(n){
-  const s=sub(), m=marksOf(n); const parts=[];
-  s.items.forEach((it,i)=>{ if(m[i]>=0){ const t=sentence(it.texts[m[i]]||''); if(t) parts.push(t); } });
-  const x = sentence(s.extra[n]||''); if(x) parts.push(x);
-  return parts.join(' ');
-}
-function neisBytes(t){ let b=0; for(const ch of t){ if(ch==='\n') b+=2; else b += ch.charCodeAt(0)<128 ? 1 : 3; } return b; }
-function renderResults(){
-  const s=sub(), N=state.students;
-  if(!s.items.length){ $('results').innerHTML=''; return; }
-  let h='';
-  for(let n=1;n<=N;n++){
-    const t=textFor(n), miss=marksOf(n).filter(v=>v<0).length;
-    h += `<div class="res ${t?'':'empty'}"><div class="no">${n}</div><div><div class="txt">${t?esc(t):'아직 고른 것이 없어요'}</div><div class="meta">${t.length}자 · ${neisBytes(t)}바이트${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div></div><div class="acts"><button class="btn" data-copy="${n}">복사</button></div></div>`;
-  }
-  $('results').innerHTML = h;
-  $('results').querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(textFor(+b.dataset.copy), `${b.dataset.copy}번 복사했어요`));
+  $('grid').querySelectorAll('[data-alt]').forEach(b => b.onclick = () => {
+    const n=b.dataset.alt; S.salt[s.name] ||= {}; S.salt[s.name][n]=(S.salt[s.name][n]||0)+1; save(); render();
+  });
+  $('grid').querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(textOf(+b.dataset.copy, pick), `${b.dataset.copy}번 복사했어요`));
 }
 async function copy(text, msg){
   try{ await navigator.clipboard.writeText(text); }
   catch(e){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
   toast(msg);
 }
-
-/* ---------- 버튼 ---------- */
-$('parseBtn').onclick = parsePaste;
-$('addItemBtn').onclick = () => { const s=sub(); s.items.push({name:'새 성취기준', texts:s.levels.map(()=> '')}); save(); renderAll(); };
-$('nStudents').oninput = e => { const v=Math.max(1,Math.min(40,+e.target.value||1)); state.students=v; save(); renderGrid(); renderResults(); };
-$('clearMarks').onclick = () => { const s=sub(); if(!$('clearMarks').dataset.armed){ $('clearMarks').dataset.armed='1'; $('clearMarks').textContent='한 번 더 누르면 지워요'; setTimeout(()=>{delete $('clearMarks').dataset.armed; $('clearMarks').textContent='이 과목 선택 지우기';},3000); return; } s.marks={}; s.extra={}; save(); renderAll(); toast('지웠어요'); };
-$('copyAll').onclick = () => { const N=state.students, lines=[]; for(let n=1;n<=N;n++) lines.push(`${n}. ${textFor(n)}`); copy(lines.join('\n'), '전체 복사했어요'); };
-$('copyTsv').onclick = () => { const N=state.students, lines=['번호\t'+state.current+' 평어']; for(let n=1;n<=N;n++) lines.push(`${n}\t${textFor(n)}`); copy(lines.join('\n'), '엑셀에 붙여 넣으면 번호·평어 두 칸으로 들어가요'); };
-$('sampleBtn').onclick = () => {
-  $('paste').value = ['성취기준\t상\t중\t하',
-    '작품 속 인물의 마음 짐작하기\t작품 속 인물의 말과 행동을 근거로 인물의 마음을 깊이 있게 짐작함\t작품 속 인물의 말과 행동을 살펴 인물의 마음을 짐작함\t도움을 받아 작품 속 인물의 마음을 짐작함',
-    '토의하며 의견 조정하기\t토의에서 근거를 들어 의견을 말하고 다른 의견과 조정하여 해결 방안을 찾음\t토의에서 자신의 의견을 말하고 다른 사람의 의견을 들음\t도움을 받아 토의에 참여하여 자신의 의견을 말함',
-    '목적에 맞게 글쓰기\t쓰는 목적과 읽는 사람을 고려하여 짜임새 있는 글을 씀\t쓰는 목적을 생각하며 글을 씀\t도움을 받아 자신의 생각을 글로 씀'].join('\n');
-  $('parseMsg').textContent = '예시를 넣었어요. "표 읽기"를 누르세요.';
-};
-$('exportBtn').onclick = () => {
-  const out = {app:'pyeongeo-helper', v:1, subjects:{}};
-  Object.entries(state.subjects).forEach(([k,v]) => { if(v.items.length) out.subjects[k] = {levels:v.levels, items:v.items}; });
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'})); a.download='평어 설정.json'; a.click();
-};
-$('importBtn').onclick = () => $('importFile').click();
-$('importFile').onchange = async e => {
-  const f=e.target.files[0]; if(!f) return;
-  try{
-    const d=JSON.parse(await f.text());
-    if(d.app!=='pyeongeo-helper') throw 0;
-    Object.entries(d.subjects).forEach(([k,v]) => { state.subjects[k] = {levels:v.levels, items:v.items, marks:{}, extra:{}}; });
-    save(); renderAll(); toast(`${Object.keys(d.subjects).length}과목을 불러왔어요`);
-  }catch(err){ toast('이 도구에서 저장한 설정 파일이 아니에요'); }
-  e.target.value='';
-};
-
-function renderAll(){ $('nStudents').value = state.students; renderTabs(); renderItems(); renderGrid(); renderResults(); }
-renderAll();
+$('copyAll').onclick = () => { const {pick}=assign(); const L=[]; for(let n=1;n<=S.num;n++) L.push(`${n}. ${textOf(n,pick)}`); copy(L.join('\n'), `${S.subj} 전체 복사했어요`); };
+$('copyTsv').onclick = () => { const {pick}=assign(); const L=[`번호\t${S.subj}`]; for(let n=1;n<=S.num;n++) L.push(`${n}\t${textOf(n,pick)}`); copy(L.join('\n'), '엑셀에 붙이면 번호·평어 두 칸으로 들어가요'); };
+$('cls').onchange = e => { S.cls = Math.max(1, Math.min(20, +e.target.value||1)); save(); render(); };
+$('num').onchange = e => { S.num = Math.max(1, Math.min(40, +e.target.value||1)); save(); render(); };
+render();
 </script>
 </body>
 </html>
