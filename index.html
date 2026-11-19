@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>성적 평어 도우미</title>
-<meta name="description" content="6학년 2학기 평가계획의 성취기준별 ◎○△를 누르면 담임이 쓴 것 같은 교과 평어가 반 안에서 겹치지 않게 만들어집니다.">
+<meta name="description" content="1~6학년 2학기 평가계획의 성취기준별 ◎○△를 누르면 담임이 쓴 것 같은 교과 평어가 반 안에서 겹치지 않게 만들어집니다.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 :root{
@@ -31,7 +31,13 @@ h1 small{font-size:14px;color:var(--sub);font-weight:500;margin-left:6px}
 .cls{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:15px;flex-wrap:wrap}
 .cls input{width:58px;font:inherit;text-align:center;padding:6px 4px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
 .cls b{font-weight:700}
+.cls select{font:inherit;font-weight:700;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
 .safe{font-size:12px;color:var(--sub)}
+.safe-box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:2px 0 6px;font-size:13px}
+.safe-box summary{cursor:pointer;color:var(--ink)}
+.safe-box summary span{color:var(--sub);font-size:12px;margin-left:6px}
+.safe-box ul{margin:8px 0 2px;padding-left:18px;color:var(--sub);line-height:1.7}
+.safe-box li b{color:var(--ink)}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;padding:6px 0 14px;position:sticky;top:0;background:var(--bg);z-index:5}
 .tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 15px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px}
 .tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -79,20 +85,30 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 <body>
 <div class="wrap">
   <header>
-    <h1>성적 평어 도우미<small>6학년 2학기</small></h1>
+    <h1>성적 평어 도우미<small id="sub">2학기</small></h1>
     <div class="cls">
-      <b>6학년</b><input type="number" id="cls" min="1" max="20" aria-label="반"><b>반</b>
+      <select id="grade" aria-label="학년"><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option></select><input type="number" id="cls" min="1" max="20" aria-label="반"><b>반</b>
       <span style="width:6px"></span>
       학생<input type="number" id="num" min="1" max="40" aria-label="학생 수">명
     </div>
   </header>
-  <div class="safe">학생 이름은 받지 않아요. 고른 것은 이 컴퓨터 브라우저에만 저장돼요.</div>
+  <details class="safe-box">
+    <summary>🔒 <b>학생 정보는 이 컴퓨터 밖으로 나가지 않아요</b> <span>자세히</span></summary>
+    <ul>
+      <li><b>이름을 받지 않아요.</b> 학생은 번호로만 다뤄요.</li>
+      <li><b>나이스 파일은 올라가지 않아요.</b> 파일은 이 브라우저 안에서만 열고, 번호·영역·성취기준·◎○△ 칸만 읽어요. 이름 칸은 아예 읽지 않아요. 파일 내용이 서버나 다른 곳으로 보내지지 않아요.</li>
+      <li><b>서버가 없어요.</b> 이 페이지는 화면만 있는 웹페이지예요. 평어 문장은 페이지 안에 미리 들어 있고, AI에 묻지 않아요. 인터넷에서는 글꼴과 엑셀 읽기 도구만 내려받고, 보내는 것은 없어요.</li>
+      <li><b>저장도 이 컴퓨터에만 돼요.</b> 고른 ◎○△는 이 브라우저(로컬 저장소)에만 남아요. 다른 컴퓨터나 다른 선생님에게는 보이지 않아요.</li>
+      <li>공용 컴퓨터에서 썼다면 다 쓴 뒤 지워 주세요. <button class="btn small" id="wipeAll">이 컴퓨터에 저장된 것 지우기</button></li>
+    </ul>
+  </details>
 
   <nav class="tabs" id="tabs"></nav>
 
   <div class="bar">
     <span class="note" id="status"></span>
     <div class="right">
+      <button class="btn" id="neisBtn" title="나이스 [교과평가(교과별)] 엑셀을 넣으면 ◎○△가 채워져요">나이스 파일 넣기</button><input type="file" id="neisFile" accept=".xlsx,.xls" hidden>
       <button class="btn" id="copyTsv">엑셀용 복사</button>
       <button class="btn primary" id="copyAll">이 과목 전체 복사</button>
     </div>
@@ -103,25 +119,24 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
   <div class="scroll"><table class="g" id="grid"></table></div>
 
   <p class="guide">
-    ◎○△를 누르면 평어가 바로 만들어져요. 성취기준이 3개보다 많은 과목은 학생마다 3개를 골라 3문장으로 써요(반 안에서 영역이 고르게 돌아가요). 같은 반에서 평어가 똑같은 학생은 생기지 않게 문장을 골라 줘요. 마음에 안 들면 <b>다른 문장</b>을 누르세요.<br>
+    ◎○△를 누르거나, 나이스에서 내려받은 [교과평가(교과별)] 엑셀을 <b>나이스 파일 넣기</b>로 넣으면 평어가 바로 만들어져요(이름 칸은 읽지 않아요). 성취기준이 3개보다 많은 과목은 학생마다 3개를 골라 3문장으로 써요(반 안에서 영역이 고르게 돌아가요). 같은 반에서 평어가 똑같은 학생은 생기지 않게 문장을 골라 줘요. 마음에 안 들면 <b>다른 문장</b>을 누르세요.<br>
     나이스 <b>학기말 종합의견</b>에 넣고 2학기에 체크한 뒤 일괄저장하세요 (교과학습발달상황에 바로 넣으면 2학기 성적이 빠진 것으로 나와요). 바이트는 나이스 방식(한글 3, 영문·숫자·공백 1)으로 셌어요.
   </p>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="data/g6-2.js?v=2"></script>
 <script>
-const D = window.PY_DATA;
+const DATA_V = 3;   // 데이터를 바꾸면 올린다
+let D = null, G = 6, KEY = '';
 const LV = ['◎','○','△'];
-const KEY = 'pyeongeo-g6-2';
 const MAXS = 3;   // 학생마다 평어에 넣는 성취기준 수 (11/19 사용자: 과목당 3문장)
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-let S = load() || {cls:1, num:25, subj:D.subjects[0].name, marks:{}, salt:{}};
+let S = null;
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
-function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),1600); }
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),m.length>40?4200:1600); }
 const subj = () => D.subjects.find(s => s.name===S.subj) || D.subjects[0];
 function marks(n){ const s=subj(); S.marks[s.name] ||= {}; const m = S.marks[s.name][n] ||= []; while(m.length<s.items.length) m.push(-1); return m; }
 function saltOf(n){ return ((S.salt[subj().name]||{})[n])||0; }
@@ -257,11 +272,93 @@ async function copy(text, msg){
   catch(e){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
   toast(msg);
 }
+/* ---- 나이스 교과평가(교과별) 엑셀 넣기: 번호·영역·성취기준·평가결과만 읽음 (이름 칸은 읽지 않음) ---- */
+function loadXLSX(){
+  return new Promise((ok,no)=>{ if(window.XLSX) return ok(); const sc=document.createElement('script');
+    sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; sc.onload=ok; sc.onerror=no; document.head.appendChild(sc); });
+}
+const norm = t => String(t||'').replace(/[\s·∙ㆍ.,()\[\]'"“”‘’\-]/g,'');
+function prefixLen(a,b){ let i=0; while(i<a.length && i<b.length && a[i]===b[i]) i++; return i; }
+function parseNeis(rows){
+  const LVMAP={'◎':0,'○':1,'△':2};
+  let col=null, title='', cur=null; const out=[];
+  for(const r of rows){
+    const cells=r.map(v=>v==null?'':String(v).trim());
+    const joined=cells.join(' ');
+    if(!title && /학년\s*\d+\s*반/.test(joined)) title=joined;
+    const hi=cells.indexOf('반/번호');
+    if(hi>=0){ col={no:hi, area:cells.indexOf('영역'), std:cells.indexOf('성취기준'), task:cells.indexOf('평가요소'), lv:cells.indexOf('단계'), res:cells.indexOf('평가결과')}; continue; }
+    if(!col) continue;
+    const no=parseInt(cells[col.no],10); if(!isNaN(no)) cur=no;
+    const mk = (col.res>=0 && LVMAP[cells[col.res]]!==undefined) ? cells[col.res] : (col.lv>=0 ? cells[col.lv] : '');
+    if(cur==null || LVMAP[mk]===undefined) continue;   // 쪽이 넘어가며 쪼개진 줄(◎○△ 없음)은 건너뜀
+    out.push({n:cur, area:cells[col.area]||'', std:cells[col.std]||'', task:col.task>=0?cells[col.task]:'', k:LVMAP[mk]});
+  }
+  return {title, out};
+}
+function matchItem(subject, row){
+  let best=-1, bs=0;
+  subject.items.forEach((it,i)=>{
+    const sc = (norm(it.area)===norm(row.area)?6:0) + Math.min(30,prefixLen(norm(it.std),norm(row.std))) + Math.min(15,prefixLen(norm(it.task),norm(row.task)))/2;
+    if(sc>bs){ bs=sc; best=i; }
+  });
+  return bs>=10 ? best : -1;
+}
+async function importNeis(file){
+  try{ await loadXLSX(); }catch(e){ toast('엑셀 읽기 도구를 못 불러왔어요 (인터넷 확인)'); return; }
+  const wb=XLSX.read(await file.arrayBuffer(), {type:'array'});
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, raw:false, defval:''});
+  const {title, out}=parseNeis(rows);
+  if(!out.length){ toast('◎○△ 줄을 못 찾았어요. 나이스 [교과평가(교과별)] 엑셀인지 확인해 주세요'); return; }
+  const m=title.match(/(\d)\s*학년\s*(\d+)\s*반/);
+  if(m && +m[1]!==G){ await boot(+m[1]); }
+  // 과목 찾기: 줄이 가장 많이 맞는 과목
+  let bestS=null, bestHit=-1;
+  for(const sj of D.subjects){ const hit=out.filter(r=>matchItem(sj,r)>=0).length; if(hit>bestHit){ bestHit=hit; bestS=sj; } }
+  if(!bestS || bestHit===0){ toast('이 학년 평가계획과 맞는 성취기준이 없어요'); return; }
+  S.subj=bestS.name;
+  if(m) S.cls=+m[2];
+  const maxN=Math.max(...out.map(r=>r.n)); if(maxN>S.num) S.num=Math.min(40,maxN);
+  let filled=0, miss=0; const ns=new Set();
+  for(const r of out){ const i=matchItem(bestS,r); if(i<0){ miss++; continue; } marks(r.n)[i]=r.k; filled++; ns.add(r.n); }
+  save(); render();
+  toast(`${bestS.name} ${ns.size}명 · ◎○△ ${filled}칸을 채웠어요${miss?` (못 맞춘 줄 ${miss}개)`:''}`);
+}
+let wipeArmed=false;
+$('wipeAll').onclick = () => {
+  if(!wipeArmed){ wipeArmed=true; $('wipeAll').textContent='정말 지울까요? 한 번 더 누르기'; return; }
+  try{ Object.keys(localStorage).filter(k=>k.startsWith('pyeongeo')).forEach(k=>localStorage.removeItem(k)); }catch(e){}
+  wipeArmed=false; $('wipeAll').textContent='이 컴퓨터에 저장된 것 지우기';
+  S=null; boot(G); toast('이 컴퓨터에 저장된 것을 모두 지웠어요');
+};
+$('neisBtn').onclick = () => $('neisFile').click();
+$('neisFile').onchange = e => { const f=e.target.files[0]; e.target.value=''; if(f) importNeis(f); };
 $('copyAll').onclick = () => { const {pick}=assign(); const L=[]; for(let n=1;n<=S.num;n++) L.push(`${n}. ${textOf(n,pick)}`); copy(L.join('\n'), `${S.subj} 전체 복사했어요`); };
 $('copyTsv').onclick = () => { const {pick}=assign(); const L=[`번호\t${S.subj}`]; for(let n=1;n<=S.num;n++) L.push(`${n}\t${textOf(n,pick)}`); copy(L.join('\n'), '엑셀에 붙이면 번호·평어 두 칸으로 들어가요'); };
 $('cls').onchange = e => { S.cls = Math.max(1, Math.min(20, +e.target.value||1)); save(); render(); };
 $('num').onchange = e => { S.num = Math.max(1, Math.min(40, +e.target.value||1)); save(); render(); };
-render();
+/* ---- 학년 고르기: 학년마다 데이터 파일·저장을 따로 ---- */
+function loadData(g){
+  return new Promise((ok, no) => {
+    if (window.PY_ALL && window.PY_ALL[g]) return ok(window.PY_ALL[g]);
+    const sc = document.createElement('script'); sc.src = `data/g${g}-2.js?v=${DATA_V}`;
+    sc.onload = () => (window.PY_ALL && window.PY_ALL[g]) ? ok(window.PY_ALL[g]) : no();
+    sc.onerror = no; document.head.appendChild(sc);
+  });
+}
+async function boot(g){
+  try { D = await loadData(g); } catch(e) { toast(`${g}학년 데이터를 못 불러왔어요`); return; }
+  G = g; KEY = `pyeongeo-g${g}-2`;
+  try { localStorage.setItem('pyeongeo-grade', g); } catch(e) {}
+  S = load() || {cls:1, num:25, subj:D.subjects[0].name, marks:{}, salt:{}};
+  if (!D.subjects.some(x => x.name === S.subj)) S.subj = D.subjects[0].name;
+  $('grade').value = g; $('sub').textContent = D.title;
+  document.title = `성적 평어 도우미 · ${D.title}`;
+  render();
+}
+$('grade').onchange = e => boot(+e.target.value);
+let g0 = 6; try { g0 = +localStorage.getItem('pyeongeo-grade') || 6; } catch(e) {}
+boot(g0);
 </script>
 </body>
 </html>

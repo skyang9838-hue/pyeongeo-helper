@@ -1,5 +1,6 @@
-window.PY_DATA = {
+(window.PY_ALL = window.PY_ALL || {})[6] = window.PY_DATA = {
 "title": "6학년 2학기",
+"grade": 6,
 "source": "2026학년도 2학기 6학년 평가 기본계획",
 "subjects": [
 {

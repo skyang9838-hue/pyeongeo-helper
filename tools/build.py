@@ -1,12 +1,16 @@
 import json, os, re, sys
 S = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(S, '..', 'data', 'g6-2.js')
-plan = json.load(open(os.path.join(S, 'plan.json'), encoding='utf-8'))
-order = ['국어','도덕','사회','수학','과학','실과','체육','음악','미술','영어']
+# 학년: --grade N (기본 6). 6학년은 옛 자리(tools/plan.json, tools/out), 나머지는 tools/gN/plan.json, tools/gN/out
+G = int(sys.argv[sys.argv.index('--grade')+1]) if '--grade' in sys.argv else 6
+BASE = S if G == 6 else os.path.join(S, f'g{G}')
+OUT = os.path.join(S, '..', 'data', f'g{G}-2.js')
+plan = json.load(open(os.path.join(BASE, 'plan.json'), encoding='utf-8'))
+order = [k for k in plan.keys() if not k.startswith('_')]
+SOURCE = plan.get('_source', f'2026학년도 2학기 {G}학년 평가 기본계획')
 problems, subjects, allsent = [], [], {}
 END = re.compile(r'(함|임|음|됨|짐|김|림|힘|봄|춤|움|냄|큼|줌|둠|씀|름|함\)|보임|뛰어남|돋보임|기대됨|나타남|드러남|높음|좋음|있음|없음|많음)\.$')
 for subj in order:
-    p = os.path.join(S, 'out', subj + '.json')
+    p = os.path.join(BASE, 'out', subj + '.json')
     if not os.path.exists(p):
         problems.append(f'{subj}: 파일 없음'); continue
     got = json.load(open(p, encoding='utf-8'))
@@ -37,6 +41,6 @@ print('문장 수', len(allsent))
 print('문제', len(problems)); print('\n'.join(problems[:80]))
 if '--write' in sys.argv:
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    data = {'title': '6학년 2학기', 'source': '2026학년도 2학기 6학년 평가 기본계획', 'subjects': subjects}
-    open(OUT, 'w', encoding='utf-8').write('window.PY_DATA = ' + json.dumps(data, ensure_ascii=False, indent=0) + ';\n')
+    data = {'title': f'{G}학년 2학기', 'grade': G, 'source': SOURCE, 'subjects': subjects}
+    open(OUT, 'w', encoding='utf-8').write(f'(window.PY_ALL = window.PY_ALL || {{}})[{G}] = window.PY_DATA = ' + json.dumps(data, ensure_ascii=False, indent=0) + ';\n')
     print('저장', OUT)
