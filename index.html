@@ -397,6 +397,9 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
   .g td.lv::before{font-size:12px;font-weight:500}
   .toast{top:calc(var(--ab) + 12px)}
 }
+
+/* 끌어다 놓기 */
+body.dropping::after{content:"여기에 놓으면 나이스 파일을 한꺼번에 읽어요 · 파일 이름은 상관없어요";position:fixed;inset:12px;z-index:60;display:grid;place-items:center;border:3px dashed var(--ink2);border-radius:var(--r3);background:color-mix(in srgb,var(--bg) 88%,transparent);font-size:20px;font-weight:800;color:var(--ink);pointer-events:none}
 </style>
 </head>
 <body>
@@ -473,7 +476,7 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
         </div>
       </div>
       <div class="stepbtns" id="flow">
-        <div class="sb" data-k="1"><span class="sl"><i>1</i><em>◎○△ 넣기 <small>표에서 누르거나</small></em></span><button class="btn" id="neisBtn" title="나이스 [교과평가(교과별)] 엑셀을 여러 과목·여러 반 한꺼번에 골라 넣으면 알아서 채워요. 표에서 직접 눌러도 돼요"><svg><use href="#i-up"/></svg>나이스 파일로 한 번에 넣기</button><input type="file" id="neisFile" accept=".xlsx,.xls" multiple hidden></div>
+        <div class="sb" data-k="1"><span class="sl"><i>1</i><em>◎○△ 넣기 <small>표에서 누르거나 파일을 끌어다 놓기</small></em></span><button class="btn" id="neisBtn" title="나이스 [교과평가(교과별)] 엑셀을 여러 과목·여러 반 한꺼번에 골라 넣으면 알아서 채워요. 표에서 직접 눌러도 돼요"><svg><use href="#i-up"/></svg>나이스 파일로 한 번에 넣기</button><input type="file" id="neisFile" accept=".xlsx,.xls" multiple hidden></div>
         <div class="sb" data-k="2"><span class="sl"><i>2</i><em>평어 만들기</em></span><button class="btn primary" id="genBtn"><svg><use href="#i-play"/></svg>평어 만들기</button></div>
         <div class="sb" data-k="3"><span class="sl"><i>3</i><em>복사해 나이스에</em></span><button class="btn" id="copyAll" title="번호와 평어를 표 모양으로 복사해요. 엑셀이나 한글 표에 붙이면 두 칸으로 들어가요"><svg><use href="#i-copy"/></svg>이 과목 평어 복사</button></div>
         <button class="btn ghost small" id="resetBtn" title="이 과목의 ◎○△와 평어를 비워요"><svg><use href="#i-reset"/></svg>초기화</button>
@@ -484,7 +487,7 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 
     <div class="more">
       <details class="std panel" id="stdBox"><summary>이 과목 성취기준·평가기준 보기</summary><div class="stdlist" id="stdList"></div></details>
-      <details class="std panel" id="howBox"><summary>쓰는 법 자세히</summary><div class="howlist"><div><b class="n">1</b><div><h4>◎○△ 넣기</h4><p>번호마다 성취기준별 ◎○△를 누르거나, 맨 위 <b>전체</b> 줄로 반 전체를 한 번에 채운 뒤 다른 학생만 바꿔요. 나이스에서 내려받은 [교과평가(교과별)] 엑셀을 <b>나이스 파일 넣기</b>로 넣어도 돼요. 과목별 파일을 <b>여러 개 한꺼번에</b> 고르면 과목마다 알아서 채워요.</p></div></div><div><b class="n">2</b><div><h4>평어 만들기</h4><p>번호 차례로 성취기준을 고르고 문장을 써요. 성취기준이 3개보다 많은 과목은 학생마다 3개만 골라 3문장으로 쓰고, 반 안에서 영역이 고르게 돌아가요. 마음에 안 들면 <b>다른 문장</b>.</p></div></div><div><b class="n">3</b><div><h4>나이스에 넣기</h4><p>번호 옆 <b>복사</b>로 한 명씩, <b>이 과목 평어 복사</b>로 반 전체(번호·평어 두 칸)를 복사해요. 나이스 <b>학기말 종합의견</b>에 붙여 넣고 2학기에 체크한 뒤 일괄저장하세요. 교과학습발달상황에 바로 넣으면 2학기 성적이 빠진 것으로 나와요. 바이트는 나이스 방식(한글 3, 영문·숫자·공백 1)으로 셌어요.</p></div></div></div></details>
+      <details class="std panel" id="howBox"><summary>쓰는 법 자세히</summary><div class="howlist"><div><b class="n">1</b><div><h4>◎○△ 넣기</h4><p>번호마다 성취기준별 ◎○△를 누르거나, 맨 위 <b>전체</b> 줄로 반 전체를 한 번에 채운 뒤 다른 학생만 바꿔요. 나이스에서 내려받은 [교과평가(교과별)] 엑셀을 <b>나이스 파일 넣기</b>로 넣어도 돼요. 과목별 파일을 <b>여러 개 한꺼번에</b> 고르거나 화면에 끌어다 놓으면 과목마다(전담은 반마다) 알아서 채워요. 파일 이름은 바꾸지 않아도 돼요. 파일 안의 학년·반 제목과 성취기준 문장으로 알아봐요.</p></div></div><div><b class="n">2</b><div><h4>평어 만들기</h4><p>번호 차례로 성취기준을 고르고 문장을 써요. 성취기준이 3개보다 많은 과목은 학생마다 3개만 골라 3문장으로 쓰고, 반 안에서 영역이 고르게 돌아가요. 마음에 안 들면 <b>다른 문장</b>.</p></div></div><div><b class="n">3</b><div><h4>나이스에 넣기</h4><p>번호 옆 <b>복사</b>로 한 명씩, <b>이 과목 평어 복사</b>로 반 전체(번호·평어 두 칸)를 복사해요. 나이스 <b>학기말 종합의견</b>에 붙여 넣고 2학기에 체크한 뒤 일괄저장하세요. 교과학습발달상황에 바로 넣으면 2학기 성적이 빠진 것으로 나와요. 바이트는 나이스 방식(한글 3, 영문·숫자·공백 1)으로 셌어요.</p></div></div></div></details>
     </div>
 
     <div class="scroll panel"><table class="g" id="grid"></table></div>
@@ -735,6 +738,19 @@ $('wipeAll').onclick = () => {
   S=null; ME={mode:'담임'}; $('main').hidden=true; $('start').hidden=false; pickG=0; setMode('담임'); document.querySelectorAll('#gseg button').forEach(b=>b.classList.remove('on')); $('startBtn').disabled=true; $('cls').value=1; $('num').value=25; toast('이 컴퓨터에 저장된 것을 모두 지웠어요');
 };
 $('neisBtn').onclick = () => $('neisFile').click();
+/* ---- 나이스 파일 끌어다 놓기 (본 화면 어디든) ---- */
+let dragN=0;
+const isFiles = e => e.dataTransfer && [...e.dataTransfer.types].includes('Files');
+addEventListener('dragenter', e => { if(!isFiles(e) || $('main').hidden) return; e.preventDefault(); dragN++; document.body.classList.add('dropping'); });
+addEventListener('dragover', e => { if(isFiles(e) && !$('main').hidden) e.preventDefault(); });
+addEventListener('dragleave', e => { if(!isFiles(e)) return; if(--dragN<=0){ dragN=0; document.body.classList.remove('dropping'); } });
+addEventListener('drop', e => {
+  if(!isFiles(e) || $('main').hidden) return; e.preventDefault(); dragN=0; document.body.classList.remove('dropping');
+  const fs=[...e.dataTransfer.files].filter(f=>/\.xlsx?$/i.test(f.name));
+  if(!fs.length){ toast('엑셀 파일(.xlsx, .xls)만 넣을 수 있어요'); return; }
+  if(running){ toast('평어를 다 만든 뒤에 넣어 주세요'); return; }
+  importMany(fs);
+});
 $('neisFile').onchange = e => { const fs=[...e.target.files]; e.target.value=''; if(fs.length) importMany(fs); };
 /* ---- 전담: 맡은 반 오가기 (반마다 저장 따로) ---- */
 function doneIn(st, sj){ const all=(st&&st.marks||{})[sj.name]||{}; let d=0; const N=(st&&st.num)||25; for(let n=1;n<=N;n++){ const m=all[n]; if(m && m.length>=sj.items.length && m.slice(0,sj.items.length).every(x=>x>=0)) d++; } return [d,N]; }
