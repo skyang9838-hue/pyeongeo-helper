@@ -400,6 +400,15 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 
 /* 끌어다 놓기 */
 body.dropping::after{content:"여기에 놓으면 나이스 파일을 한꺼번에 읽어요 · 파일 이름은 상관없어요";position:fixed;inset:12px;z-index:60;display:grid;place-items:center;border:3px dashed var(--ink2);border-radius:var(--r3);background:color-mix(in srgb,var(--bg) 88%,transparent);font-size:20px;font-weight:800;color:var(--ink);pointer-events:none}
+/* 학생별로 고른 성취기준 (칸 빈 곳 누르기) */
+:root{ --own:#fbe7a1; --ownb:#c99a12 }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --own:#3d3313; --ownb:#d9b03c } }
+.g tr[data-r] td.lv{cursor:pointer;padding-left:12px;padding-right:12px}
+.g tr[data-r] td.lv:hover{background:var(--soft)}
+.g tr[data-r] td.lv.own,.g tr.working td.lv.own{background:var(--own)!important;box-shadow:inset 0 0 0 2px var(--ownb)}
+.meta .own{color:var(--ink2);font-weight:700}
+.meta .own i{font-style:normal;display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--own);box-shadow:inset 0 0 0 1.5px var(--ownb);margin-right:4px;vertical-align:-1px}
+@media (max-width:720px){ .g tr[data-r] td.lv{padding:8px 8px} }
 </style>
 </head>
 <body>
@@ -515,6 +524,7 @@ function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} 
 function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),m.length>40?4200:1600); }
 const subj = () => D.subjects.find(s => s.name===S.subj) || D.subjects[0];
 function marks(n){ const s=subj(); S.marks[s.name] ||= {}; const m = S.marks[s.name][n] ||= []; while(m.length<s.items.length) m.push(-1); return m; }
+function ownOf(n){ const s=subj(); return (((S.own||{})[s.name]||{})[n]||[]).filter(i=>i<s.items.length); }
 function saltOf(n){ return ((S.salt[subj().name]||{})[n])||0; }
 
 /* ---- 섞기 (반·과목마다 같은 결과) ---- */
@@ -526,6 +536,8 @@ function perm(n, key){ const r=rng(hash(key)); const a=[...Array(n).keys()]; for
 function focusOf(){ const s=subj(); return ((S.focus||{})[s.name]||[]).filter(i=>i<s.items.length); }
 function chosen(n){
   const s=subj(), K=s.items.length, m=marks(n), F=focusOf();
+  const own=ownOf(n).filter(i=>m[i]>=0);   // 선생님이 이 학생에게 직접 고른 성취기준이 있으면 그것만
+  if(own.length) return own.sort((a,b)=>a-b);
   const marked=[...Array(K).keys()].filter(i=>m[i]>=0 && (!F.length || F.includes(i)));
   if(marked.length<=MAXS) return marked;
   const p=perm(K, `${S.cls}|${s.name}|sub`), start=((n-1)*MAXS + saltOf(n)) % K, out=[];
@@ -595,6 +607,7 @@ function textOf(n, pick){
   const s=subj(), m=marks(n);
   return chosen(n).map(i => s.items[i].v[m[i]][pick[n][i]]).join(' ');
 }
+function ownTag(n){ const s=subj(), m=marks(n), o=ownOf(n).filter(i=>m[i]>=0).sort((a,b)=>a-b); return o.length?` · <span class="own"><i></i>고름: ${o.map(i=>esc(s.items[i].code)).join('·')}</span>`:''; }
 function neisBytes(t){ let b=0; for(const ch of t){ b += ch==='\n'?2:(ch.charCodeAt(0)<128?1:3); } return b; }
 
 /* ---- 그리기 ---- */
@@ -620,12 +633,12 @@ function render(){
   const ready = gen && !running;
   const s=subj(), N=S.num, {pick, use}=assign();
   let h = `<thead><tr><th>번호</th>${s.items.map(it=>`<th class="code" title="${esc(it.std)}">${esc(it.code)}<span>${esc(it.area)}</span></th>`).join('')}<th style="text-align:left">평어</th><th></th></tr></thead><tbody>`;
-  h += `<tr class="all"><td class="no">전체</td>${s.items.map((it,i)=>`<td class="lv" data-c="${esc(it.code)}">${segHTML(-1,`data-all="${i}"`)}</td>`).join('')}<td class="txt">누르면 그 성취기준을 반 전체에 넣어요. 대부분 ○로 채우고 다른 학생만 바꾸면 빨라요.</td><td></td></tr>`;
+  h += `<tr class="all"><td class="no">전체</td>${s.items.map((it,i)=>`<td class="lv" data-c="${esc(it.code)}">${segHTML(-1,`data-all="${i}"`)}</td>`).join('')}<td class="txt">누르면 그 성취기준을 반 전체에 넣어요. 대부분 ○로 채우고 다른 학생만 바꾸면 빨라요. 학생 칸의 빈 곳을 누르면 그 학생 평어에 넣을 성취기준을 고를 수 있어요 (최대 ${MAXS}개).</td><td></td></tr>`;
   for(let n=1;n<=N;n++){
-    const m=marks(n), t=textOf(n,pick), miss=m.filter(x=>x<0).length;
+    const m=marks(n), t=textOf(n,pick), miss=m.filter(x=>x<0).length, own=ownOf(n);
     const show = gen && t;
-    h += `<tr data-r="${n}" class="${gen&&!t?'skip':''}"><td class="no">${n}</td>${s.items.map((it,i)=>`<td class="lv" data-c="${esc(it.code)}">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
-      <td class="txt">${show?`<div class="t">${esc(t)}</div><div class="meta">${t.length}자 · ${neisBytes(t)}바이트${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`:(gen&&!t ? `<div class="t skip">◎○△가 없어 건너뛰었어요</div>` : `<div class="t ${t?'wait':'empty'}">${t?'평어 만들기를 누르면 나와요':'◎○△를 누르세요'}</div>`)}</td>
+    h += `<tr data-r="${n}" class="${gen&&!t?'skip':''}"><td class="no">${n}</td>${s.items.map((it,i)=>`<td class="lv${own.includes(i)?' own':''}" data-c="${esc(it.code)}" data-on="${n}" data-oi="${i}" title="빈 곳을 누르면 이 학생 평어에 넣을 성취기준으로 골라요 (최대 ${MAXS}개)">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
+      <td class="txt">${show?`<div class="t">${esc(t)}</div><div class="meta">${t.length}자 · ${neisBytes(t)}바이트${ownTag(n)}${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`:(gen&&!t ? `<div class="t skip">◎○△가 없어 건너뛰었어요</div>` : `<div class="t ${t?'wait':'empty'}">${t?'평어 만들기를 누르면 나와요':'◎○△를 누르세요'}</div>`)}</td>
       <td class="act">${show?`<span class="rowact"><button data-alt="${n}" title="같은 ◎○△로 다른 문장"><svg><use href="#i-reset"/></svg>다른 문장</button><button data-copy="${n}" title="이 학생 평어 복사"><svg><use href="#i-copy"/></svg>복사</button></span>`:''}</td></tr>`;
   }
   h += `</tbody>`;
@@ -648,6 +661,17 @@ function bind(pick){
   $('grid').querySelectorAll('button[data-n]').forEach(b => b.onclick = () => {
     const m=marks(+b.dataset.n), i=+b.dataset.i, k=+b.dataset.k;
     m[i] = m[i]===k ? -1 : k; ungen(); save(); render();
+  });
+  $('grid').querySelectorAll('td[data-on]').forEach(td => td.onclick = e => {
+    if(e.target.closest('button') || running) return;
+    const n=+td.dataset.on, i=+td.dataset.oi;
+    S.own ||= {}; const all = S.own[s.name] ||= {}; const cur = ownOf(n);
+    if(cur.includes(i)) all[n] = cur.filter(x=>x!==i);
+    else if(cur.length>=MAXS){ toast(`한 학생에 성취기준은 최대 ${MAXS}개예요. 하나를 먼저 풀어 주세요`); return; }
+    else all[n] = [...cur, i];
+    if(!all[n].length) delete all[n];
+    if(marks(n)[i]<0 && !cur.includes(i)) toast(`${n}번 ${s.items[i].code}는 ◎○△가 없어서 평어에 안 들어가요`);
+    save(); render();
   });
   $('grid').querySelectorAll('button[data-all]').forEach(b => b.onclick = () => {
     const i=+b.dataset.all, k=+b.dataset.k;
@@ -791,7 +815,7 @@ $('resetBtn').onclick = () => {
   if(!resetArmed){ resetArmed=setTimeout(()=>{ resetArmed=0; b.classList.remove('armed'); b.innerHTML='<svg><use href="#i-reset"/></svg>초기화'; }, 3000);
     b.classList.add('armed'); b.textContent=`${S.subj} 비울까요? 한 번 더`; return; }
   clearTimeout(resetArmed); resetArmed=0; b.classList.remove('armed'); b.innerHTML='<svg><use href="#i-reset"/></svg>초기화';
-  const n=S.subj; if(S.marks) delete S.marks[n]; if(S.salt) delete S.salt[n]; if(S.gen) S.gen[n]=false; if(S.focus) delete S.focus[n];
+  const n=S.subj; if(S.marks) delete S.marks[n]; if(S.salt) delete S.salt[n]; if(S.gen) S.gen[n]=false; if(S.focus) delete S.focus[n]; if(S.own) delete S.own[n];
   save(); render(); toast(`${n} ◎○△와 평어를 비웠어요`);
 };
 
@@ -817,29 +841,32 @@ async function generate(){
   $('prog').hidden=false; $('genBtn').disabled=true; $('copyAll').disabled=true; $('copyAll').classList.remove('primary');
   [...$('flow').querySelectorAll('.sb')].forEach((li,k)=>{ li.classList.toggle('now', k===1); li.classList.toggle('done', k<1); });
   const fast = () => token.skip;
+  // 전체 연출이 약 5초 안에 끝나게 (11/19 사용자: 9초 → 5초). 학생마다 시간 몫을 정해 두고, 늦으면 기다림을 건너뜀
+  const t0 = performance.now(), per = 4300 / Math.max(1, rows.length); let rowEnd = t0;
+  const w = ms => { const left = rowEnd - performance.now(); return left > 0 ? wait(Math.min(ms, left)) : Promise.resolve(); };
   for(let k=0;k<rows.length;k++){
     const n=rows[k], tr=$('grid').querySelector(`tr[data-r="${n}"]`); if(!tr) break;
     $('progFill').style.width = `${(k/rows.length)*100}%`; $('progTxt').textContent = `${n}번 만드는 중 · ${k+1}/${rows.length}`;
-    const txt=tr.querySelector('.txt'), ch=chosen(n), m=marks(n), full=textOf(n,pick);
+    const txt=tr.querySelector('.txt'), ch=chosen(n), m=marks(n), full=textOf(n,pick); rowEnd = t0 + (k+1)*per;
     if(!fast()){
       tr.classList.add('working'); tr.scrollIntoView({block:'center'});
       // 1단계: 넣을 성취기준 고르기
       txt.innerHTML = `<div class="steps">${ch.map(i=>`<span class="st" data-i="${i}">${esc(s.items[i].code)} ${LV[m[i]]}</span>`).join('')}<span class="st" data-s="w">문장 고르는 중</span></div>`;
-      for(const i of ch){ tr.querySelectorAll('td.lv')[i].classList.add('pick'); txt.querySelector(`.st[data-i="${i}"]`).classList.add('on'); await wait(60); if(fast()) break; }
-      if(!fast()){ txt.querySelector('.st[data-s="w"]').classList.add('on'); await wait(70); }
+      for(const i of ch){ tr.querySelectorAll('td.lv')[i].classList.add('pick'); txt.querySelector(`.st[data-i="${i}"]`).classList.add('on'); await w(60); if(fast()) break; }
+      if(!fast()){ txt.querySelector('.st[data-s="w"]').classList.add('on'); await w(70); }
       // 2단계: 문장 쓰기
       if(!fast()){
         txt.innerHTML = '<div class="t"></div>'; const t=txt.firstChild; const step=Math.ceil(full.length/8);
-        for(let c=step;c<full.length+step && !fast();c+=step){ t.textContent=full.slice(0,c); await wait(14); }
+        for(let c=step;c<full.length+step && !fast();c+=step){ t.textContent=full.slice(0,c); await w(14); }
       }
       tr.querySelectorAll('td.lv.pick').forEach(td=>td.classList.remove('pick')); tr.classList.remove('working');
     }
     const miss=m.filter(x=>x<0).length;
-    txt.innerHTML = `<div class="t pop">${esc(full)}</div><div class="meta">${full.length}자 · ${neisBytes(full)}바이트${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`;
+    txt.innerHTML = `<div class="t pop">${esc(full)}</div><div class="meta">${full.length}자 · ${neisBytes(full)}바이트${ownTag(n)}${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`;
     tr.querySelector('.act').classList.remove('hide');
   }
   $('progFill').style.width='100%'; $('progTxt').textContent=`${rows.length}명 평어 완성!`;
-  await wait(fast()?200:900);
+  await wait(fast()?200:350);
   $('prog').hidden=true; running=null;
   render(); toast(`${s.name} ${rows.length}명 평어를 만들었어요`);
 }
