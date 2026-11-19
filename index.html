@@ -425,6 +425,37 @@ body.scrolled .appbar{position:relative}
 }
 .meta .own i{font-style:normal;display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--own);box-shadow:inset 0 0 0 1.5px var(--ownb);margin-right:4px;vertical-align:-1px}
 @media (max-width:720px){ .g tr[data-r] td.lv{padding:8px 8px} }
+/* 전담: 학년마다 맡은 학급 고르기 (11/19 사용자) */
+.jpick{display:grid;gap:8px;margin-top:4px}
+.jrow{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.jrow b{width:44px;font-size:14px;flex:none}
+.jrow button{min-width:34px;height:36px;padding:0 6px;border:1px solid var(--line2);background:var(--paper);border-radius:10px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink)}
+.jrow button:hover{border-color:var(--ink2)}
+.jrow button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.jrow .jall{padding:0 9px;margin-right:2px}
+.jrow .jadd{border-style:dashed;color:var(--sub)}
+.tabs .tsep{width:1px;align-self:stretch;background:var(--line2);margin:8px 2px;flex:none}
+/* 나이스 파일 몽땅 넣기 창 (11/19 사용자) */
+.dlg{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px}
+.dlg-card{background:var(--paper);color:var(--ink);border-radius:var(--r3);max-width:580px;width:100%;padding:24px;position:relative;box-shadow:0 20px 60px -20px rgba(0,0,0,.5);max-height:90vh;overflow:auto}
+.dlg-card h3{margin:0 0 6px;font-size:19px;letter-spacing:-.02em}
+.dlg-card p{margin:0 0 16px;color:var(--ink2);font-size:14px}
+.dlg .x{position:absolute;top:12px;right:12px;border:0;background:transparent;font-size:24px;line-height:1;cursor:pointer;color:var(--sub);width:38px;height:38px;border-radius:var(--r1)}
+.dlg .x:hover{background:var(--soft);color:var(--ink)}
+.dz{display:grid;place-items:center;gap:8px;text-align:center;border:2.5px dashed var(--line2);border-radius:var(--r2);padding:48px 16px;cursor:pointer;background:var(--soft);transition:border-color .15s,background .15s}
+.dz svg{width:34px;height:34px;color:var(--sub)}
+.dz b{font-size:18px}
+.dz span{font-size:13px;color:var(--sub)}
+.dz:hover,.dz.over{border-color:var(--ink);background:var(--paper)}
+.dz.over b::after{content:" — 놓으세요!"}
+.dzres{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px;font-size:13px}
+.dzres li{padding:8px 12px;border-radius:var(--r1);background:var(--soft);display:flex;gap:8px;align-items:baseline}
+.dzres li em{font-style:normal;font-weight:800}
+.dzres li.ok em{color:var(--l1)}
+.dzres li.bad{color:var(--warn)}
+.dzres li .fn{color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:45%}
+.dzres .sum{background:transparent;padding:4px 2px;font-weight:700;color:var(--ink)}
+.dlg .safe{font-size:12px;color:var(--sub);margin:14px 0 0}
 /* 노트북 폭에서 표가 오른쪽으로 넘치지 않게: 평어 칸을 줄이고 행 단추를 세로로 */
 @media (min-width:721px) and (max-width:1500px){
   .g td.txt{min-width:260px}
@@ -460,11 +491,12 @@ body.scrolled .appbar{position:relative}
       <h2>어느 반 평어를 만들까요?</h2>
       <p class="hint" id="hint">학년과 반을 고르면 그 학년 과목만 열려요.</p>
       <div class="mseg" id="mseg"><button data-m="담임" class="on">담임 선생님</button><button data-m="전담">전담 선생님</button></div>
-      <span class="lab">학년</span>
+      <span class="lab" id="gLab">학년</span>
       <div class="gseg" id="gseg"><button data-g="1">1<span>학년</span></button><button data-g="2">2<span>학년</span></button><button data-g="3">3<span>학년</span></button><button data-g="4">4<span>학년</span></button><button data-g="5">5<span>학년</span></button><button data-g="6">6<span>학년</span></button></div>
-      <div id="subjPick" hidden><span class="lab">맡은 과목</span><div class="sseg" id="sseg"><span class="sh">학년을 먼저 골라 주세요</span></div></div>
+      <div id="subjPick" hidden><span class="lab">맡은 과목</span><div class="sseg" id="sseg"><span class="sh">불러오는 중…</span></div></div>
+      <div id="jPick" class="jpick" hidden></div>
       <div class="pair">
-        <div><span class="lab" id="clsLab">반</span><div class="stepper"><button type="button" data-step="cls:-1" aria-label="반 줄이기">−</button><input type="number" id="cls" min="1" max="20" inputmode="numeric" aria-label="반"><em id="clsUnit">반</em><button type="button" data-step="cls:1" aria-label="반 늘리기">+</button></div></div>
+        <div id="clsBox"><span class="lab" id="clsLab">반</span><div class="stepper"><button type="button" data-step="cls:-1" aria-label="반 줄이기">−</button><input type="number" id="cls" min="1" max="20" inputmode="numeric" aria-label="반"><em id="clsUnit">반</em><button type="button" data-step="cls:1" aria-label="반 늘리기">+</button></div></div>
         <div><span class="lab" id="numLab">학생 수</span><div class="stepper"><button type="button" data-step="num:-1" aria-label="학생 수 줄이기">−</button><input type="number" id="num" min="1" max="40" inputmode="numeric" aria-label="학생 수"><em>명</em><button type="button" data-step="num:1" aria-label="학생 수 늘리기">+</button></div></div>
       </div>
       <button class="btn primary big" id="startBtn" disabled>학년을 골라 주세요</button>
@@ -524,6 +556,16 @@ body.scrolled .appbar{position:relative}
     <div class="scroll panel"><table class="g" id="grid"></table></div>
 
 
+  </div>
+</div>
+<div class="dlg" id="dropDlg" hidden role="dialog" aria-modal="true" aria-labelledby="dzTitle">
+  <div class="dlg-card">
+    <button class="x" id="dzClose" aria-label="닫기">×</button>
+    <h3 id="dzTitle">나이스 파일 한 번에 넣기</h3>
+    <p>나이스에서 받은 [교과평가(교과별)] 엑셀을 <b>과목·반 상관없이 몽땅</b> 끌어다 놓으세요. 파일 이름은 바꾸지 않아도 돼요. 파일 안의 학년·반 제목과 성취기준 문장을 보고 알아서 채워요.</p>
+    <div class="dz" id="dz" role="button" tabindex="0"><svg><use href="#i-up"/></svg><b>여기에 끌어다 놓기</b><span>또는 눌러서 파일 고르기 · 여러 개 한꺼번에 돼요</span></div>
+    <ul class="dzres" id="dzRes"></ul>
+    <p class="safe">파일은 어디에도 올라가지 않고 이 브라우저 안에서만 읽어요. 이름 칸은 읽지 않아요.</p>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -651,7 +693,7 @@ function renderStd(){
 }
 function segHTML(picked, attrs){ return `<span class="seg">${LV.map((l,k)=>`<button class="${picked===k?'on l'+k:''}" ${attrs} data-k="${k}" title="${l}">${l}</button>`).join('')}</span>`; }
 function render(){
-  $('who').textContent = ME.mode==='전담' ? `${G}학년 ${ME.subj} 전담 · ${S.cls}반` : `${G}학년 ${S.cls}반 · 담임`;
+  $('who').textContent = ME.mode==='전담' ? `${ME.subj} 전담 · ${G}학년 ${S.cls}반` : `${G}학년 ${S.cls}반 · 담임`;
   $('numIn').value = S.num;
   renderTabs(); renderStd();
   const gen = !!(S.gen && S.gen[subj().name]);
@@ -677,7 +719,7 @@ function render(){
   $('genBtn').innerHTML = ready ? '<svg><use href="#i-reset"/></svg>다시 만들기' : '<svg><use href="#i-play"/></svg>평어 만들기';
   $('genBtn').disabled = !filled || !!running; $('copyAll').disabled = !ready;
   $('genBtn').classList.toggle('primary', !ready); $('copyAll').classList.toggle('primary', ready);
-  $('subjName').textContent = ME.mode==='전담' ? `${S.cls}반 ${s.name}` : s.name;
+  $('subjName').textContent = ME.mode==='전담' ? `${G}학년 ${S.cls}반 ${s.name}` : s.name;
   renderFocus();
   bind(pick);
 }
@@ -752,10 +794,18 @@ async function importNeis(file){
   const {title, out}=parseNeis(rows);
   if(!out.length) return {err:`${file.name}: ◎○△ 줄을 못 찾았어요`};
   const m=title.match(/(\d)\s*학년\s*(\d+)\s*반/);
-  if(m && +m[1]!==G) return {err:`${m[1]}학년 파일이에요. 처음 화면에서 ${m[1]}학년을 골라 주세요`};
-  if(m && +m[2]!==S.cls){
-    if(ME.mode==='전담'){ save(); openClass(+m[2], S.num); if(+m[2]>(ME.classes||1)){ ME.classes=+m[2]; saveMe(); } }
-    else return {err:`${m[2]}반 파일이에요 (지금 ${S.cls}반)`};
+  if(m && ME.mode==='전담'){
+    // 전담: 파일 안 학년·반 제목을 보고 그 학급으로 옮겨 넣는다. 안 고른 학급이면 맡은 학급에 더한다
+    const fg=+m[1], fc=+m[2];
+    if(fg!==G || fc!==S.cls){
+      save();
+      if(fg!==G){ await boot(fg, fc, S.num); if(G!==fg) return {err:`${fg}학년 데이터를 못 불러왔어요`}; }
+      else openClass(fc, S.num);
+    }
+    ME.sets ||= {}; const a = ME.sets[fg] ||= []; if(!a.includes(fc)){ a.push(fc); a.sort((x,y)=>x-y); } saveMe();
+  } else if(m){
+    if(+m[1]!==G) return {err:`${m[1]}학년 파일이에요. 처음 화면에서 ${m[1]}학년을 골라 주세요`};
+    if(+m[2]!==S.cls) return {err:`${m[2]}반 파일이에요 (지금 ${S.cls}반)`};
   }
   // 과목 찾기: 줄이 가장 많이 맞는 과목
   let bestS=null, bestHit=-1;
@@ -767,17 +817,27 @@ async function importNeis(file){
   let filled=0, miss=0; const ns=new Set();
   for(const r of out){ const i=matchItem(bestS,r); if(i<0){ miss++; continue; } marks(r.n)[i]=r.k; filled++; ns.add(r.n); }
   ungen(); save();
-  return {subj:bestS.name, cls:S.cls, students:ns.size, filled, miss};
+  return {subj:bestS.name, g:G, cls:S.cls, students:ns.size, filled, miss};
 }
 async function importMany(files){
-  const res=[], home=S.cls;
-  for(const f of files) res.push(await importNeis(f));
+  const res=[], home={g:G, c:S.cls};
+  for(const f of files){ let r; try{ r=await importNeis(f); }catch(e){ r={err:'엑셀을 읽지 못했어요'}; } r.file=f.name; res.push(r); }
   const ok=res.filter(r=>r && r.subj), bad=res.filter(r=>r && r.err);
-  if(ME.mode==='전담'){ if(S.cls!==home){ save(); openClass(ok.length?ok[ok.length-1].cls:home, S.num); } }
+  if(ME.mode==='전담'){
+    const t = ok.length ? {g:ok[ok.length-1].g, c:ok[ok.length-1].cls} : home;
+    if(G!==t.g || S.cls!==t.c){ save(); if(G!==t.g) await boot(t.g, t.c, S.num); else openClass(t.c, S.num); }
+    ME.cur = {g:G, c:S.cls}; saveMe();
+  }
   else if(ok.length) S.subj=ok[ok.length-1].subj;
   save(); render();
-  const msg = ok.map(r=>`${ME.mode==='전담'?r.cls+'반':r.subj} ${r.students}명${r.miss?`(못 맞춘 줄 ${r.miss})`:''}`).join(' · ');
-  toast((ok.length?`채웠어요: ${msg}`:'') + (bad.length?`${ok.length?' / ':''}${bad.map(b=>b.err).join(' / ')}`:''));
+  const msg = ok.map(r=>`${ME.mode==='전담'?r.g+'-'+r.cls+'반':r.subj} ${r.students}명${r.miss?`(못 맞춘 줄 ${r.miss})`:''}`).join(' · ');
+  if($('dropDlg').hidden) toast((ok.length?`채웠어요: ${msg}`:'') + (bad.length?`${ok.length?' / ':''}${bad.map(b=>b.err).join(' / ')}`:''));
+  if(!$('dropDlg').hidden){
+    const where = r => ME.mode==='전담' ? `${r.g}학년 ${r.cls}반 ${r.subj}` : r.subj;
+    $('dzRes').innerHTML = `<li class="sum">${ok.length}개 넣음${bad.length?` · ${bad.length}개 못 넣음`:''}</li>` +
+      ok.map(r=>`<li class="ok"><em>✓</em><span>${esc(where(r))} ${r.students}명${r.miss?` (못 맞춘 줄 ${r.miss})`:''}</span><span class="fn">${esc(r.file)}</span></li>`).join('') +
+      bad.map(r=>`<li class="bad"><em>✗</em><span>${esc(String(r.err).replace(r.file+': ',''))}</span><span class="fn">${esc(r.file)}</span></li>`).join('');
+  }
 }
 let wipeArmed=false;
 $('wipeAll').onclick = () => {
@@ -786,15 +846,22 @@ $('wipeAll').onclick = () => {
   wipeArmed=false; $('wipeAll').textContent='이 컴퓨터에 저장된 것 지우기';
   S=null; ME={mode:'담임'}; $('main').hidden=true; $('start').hidden=false; pickG=0; setMode('담임'); document.querySelectorAll('#gseg button').forEach(b=>b.classList.remove('on')); $('startBtn').disabled=true; $('cls').value=1; $('num').value=25; toast('이 컴퓨터에 저장된 것을 모두 지웠어요');
 };
-$('neisBtn').onclick = () => $('neisFile').click();
+function openDrop(){ $('dzRes').innerHTML=''; $('dropDlg').hidden=false; $('dz').focus(); }
+function closeDrop(){ $('dropDlg').hidden=true; $('dz').classList.remove('over'); }
+$('neisBtn').onclick = openDrop;
+$('dz').onclick = () => $('neisFile').click();
+$('dz').onkeydown = e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); $('neisFile').click(); } };
+$('dzClose').onclick = closeDrop;
+$('dropDlg').addEventListener('click', e => { if(e.target===$('dropDlg')) closeDrop(); });
+addEventListener('keydown', e => { if(e.key==='Escape' && !$('dropDlg').hidden) closeDrop(); });
 /* ---- 나이스 파일 끌어다 놓기 (본 화면 어디든) ---- */
 let dragN=0;
 const isFiles = e => e.dataTransfer && [...e.dataTransfer.types].includes('Files');
-addEventListener('dragenter', e => { if(!isFiles(e) || $('main').hidden) return; e.preventDefault(); dragN++; document.body.classList.add('dropping'); });
+addEventListener('dragenter', e => { if(!isFiles(e) || $('main').hidden) return; e.preventDefault(); dragN++; if($('dropDlg').hidden) document.body.classList.add('dropping'); else $('dz').classList.add('over'); });
 addEventListener('dragover', e => { if(isFiles(e) && !$('main').hidden) e.preventDefault(); });
-addEventListener('dragleave', e => { if(!isFiles(e)) return; if(--dragN<=0){ dragN=0; document.body.classList.remove('dropping'); } });
+addEventListener('dragleave', e => { if(!isFiles(e)) return; if(--dragN<=0){ dragN=0; document.body.classList.remove('dropping'); $('dz').classList.remove('over'); } });
 addEventListener('drop', e => {
-  if(!isFiles(e) || $('main').hidden) return; e.preventDefault(); dragN=0; document.body.classList.remove('dropping');
+  if(!isFiles(e) || $('main').hidden) return; e.preventDefault(); dragN=0; document.body.classList.remove('dropping'); $('dz').classList.remove('over');
   const fs=[...e.dataTransfer.files].filter(f=>/\.xlsx?$/i.test(f.name));
   if(!fs.length){ toast('엑셀 파일(.xlsx, .xls)만 넣을 수 있어요'); return; }
   if(running){ toast('평어를 다 만든 뒤에 넣어 주세요'); return; }
@@ -803,18 +870,33 @@ addEventListener('drop', e => {
 $('neisFile').onchange = e => { const fs=[...e.target.files]; e.target.value=''; if(fs.length) importMany(fs); };
 /* ---- 전담: 맡은 반 오가기 (반마다 저장 따로) ---- */
 function doneIn(st, sj){ const all=(st&&st.marks||{})[sj.name]||{}; let d=0; const N=(st&&st.num)||25; for(let n=1;n<=N;n++){ const m=all[n]; if(m && m.length>=sj.items.length && m.slice(0,sj.items.length).every(x=>x>=0)) d++; } return [d,N]; }
-function renderClassTabs(){
-  const sj=D.subjects.find(x=>x.name===ME.subj)||subj(), K=ME.classes||1;
-  let h='';
-  for(let c=1;c<=K;c++){
-    let st=null; if(c===S.cls) st=S; else { try{ st=JSON.parse(localStorage.getItem(keyOf(G,c))); }catch(e){} }
-    const [d,N]=doneIn(st,sj);
-    h+=`<button class="tab ${c===S.cls?'on':''}" data-c="${c}">${c}반<span class="cnt">${d}/${N}</span><span class="pbar"><i style="width:${Math.round(d/N*100)}%"></i></span></button>`;
+// 전담 설정: ME = {mode:'전담', subj, sets:{학년:[반…]}, max:{학년:보이는 반 수}, num, cur:{g,c}}
+function jSets(){
+  if(ME.mode==='전담' && !ME.sets && ME.g){   // 예전 판(학년 하나 + 반 수) 설정을 옮긴다
+    ME.sets = {[ME.g]: [...Array(ME.classes||1).keys()].map(i=>i+1)}; ME.cur = {g:ME.g, c:ME.cls||1};
+    delete ME.g; delete ME.classes; delete ME.cls; saveMe();
   }
-  h+=`<button class="tab add" data-add="1" title="반 하나 더">＋ 반</button>`;
+  return ME.sets || {};
+}
+function jList(){ const st=jSets(); return Object.keys(st).map(Number).sort((a,b)=>a-b).flatMap(g=>[...st[g]].sort((a,b)=>a-b).map(c=>({g,c}))); }
+function renderClassTabs(){
+  let h='', pg=0;
+  for(const {g,c} of jList()){
+    if(pg && g!==pg) h+='<span class="tsep" aria-hidden="true"></span>'; pg=g;
+    const on = g===G && c===S.cls;
+    const sj=((window.PY_ALL||{})[g]?.subjects||[]).find(x=>x.name===ME.subj);
+    let st=null; if(on) st=S; else { try{ st=JSON.parse(localStorage.getItem(keyOf(g,c))); }catch(e){} }
+    const [d,N]= sj ? doneIn(st,sj) : [0,(st&&st.num)||25];
+    h+=`<button class="tab ${on?'on':''}" data-g="${g}" data-c="${c}">${g}-${c}<span class="cnt">${d}/${N}</span><span class="pbar"><i style="width:${Math.round(d/N*100)}%"></i></span></button>`;
+  }
+  h+=`<button class="tab add" data-add="1" title="맡은 학급 고치기">＋ 학급</button>`;
   $('tabs').innerHTML=h;
-  $('tabs').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{ if(running) return; save(); openClass(+b.dataset.c, S.num); ME.cls=S.cls; saveMe(); render(); });
-  $('tabs').querySelector('[data-add]').onclick=()=>{ if(running) return; ME.classes=Math.min(20,(ME.classes||1)+1); saveMe(); save(); openClass(ME.classes, S.num); render(); };
+  $('tabs').querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{
+    if(running) return; const g=+b.dataset.g, c=+b.dataset.c; save();
+    if(g!==G) await boot(g, c, S.num); else openClass(c, S.num);
+    ME.cur={g:G, c:S.cls}; saveMe(); render();
+  });
+  $('tabs').querySelector('[data-add]').onclick=()=>{ if(running) return; $('backBtn').click(); };
 }
 
 /* ---- 평어에 쓸 성취기준 고르기 (안 고르면 자동) ---- */
@@ -931,67 +1013,108 @@ async function boot(g, c, num){
 }
 /* ---- 시작 화면: 담임(학년·반) / 전담(학년·과목·맡은 반 수). 들어가면 그 학년만 보임 ---- */
 let pickG = 0, pickS = '', mode = ME.mode || '담임';
+let pickSets = {}, pickMax = {};   // 전담: 고른 학급 {학년:[반…]}, 학년마다 보이는 반 수
 const PRIO = ['과학','영어','체육','음악','미술','도덕','실과'];   // 전담이 많이 맡는 과목 먼저
 function setMode(m){
   mode = m; document.querySelectorAll('#mseg button').forEach(b=>b.classList.toggle('on', b.dataset.m===m));
   const j = m==='전담';
-  $('subjPick').hidden = !j;
-  $('clsLab').textContent = j ? '맡은 반 수' : '반';
+  $('subjPick').hidden = !j; $('jPick').hidden = true;
+  $('gLab').hidden = j; $('gseg').hidden = j; $('clsBox').hidden = j;
+  $('clsLab').textContent = '반';
   $('clsUnit').textContent = '반';
   $('numLab').textContent = j ? '반마다 학생 수' : '학생 수';
-  $('hint').textContent = j ? '학년과 과목을 고르면 맡은 반들을 오가며 쓸 수 있어요.' : '학년과 반을 고르면 그 학년 과목만 열려요.';
-  if(j){ $('cls').value = ME.mode==='전담' && ME.classes ? ME.classes : 4; }
-  else { $('cls').value = ME.mode==='담임' && ME.cls ? ME.cls : 1; }
+  $('hint').textContent = j ? '과목을 고르고 맡은 학급을 누르세요. 여러 학년도 돼요.' : '학년과 반을 고르면 그 학년 과목만 열려요.';
+  if(j){
+    if(ME.mode==='전담'){ const st=jSets(); pickSets=JSON.parse(JSON.stringify(st)); pickMax={...(ME.max||{})}; if(!pickS) pickS=ME.subj||''; }
+    fillSubjects(); return;
+  }
+  $('cls').value = ME.mode==='담임' && ME.cls ? ME.cls : 1;
   if(pickG) selectG(pickG); else startLabel();
 }
-async function fillSubjects(g){
+const GS=[1,2,3,4,5,6];
+async function fillSubjects(){
   const box=$('sseg');
   if(mode!=='전담'){ return; }
   box.innerHTML='<span class="sh">불러오는 중…</span>';
-  let d; try{ d=await loadData(g); }catch(e){ box.innerHTML='<span class="sh">과목을 못 불러왔어요</span>'; return; }
-  if(pickG!==g) return;
-  const names=d.subjects.map(x=>x.name);
-  if(!names.includes(pickS)) pickS = (ME.mode==='전담' && names.includes(ME.subj)) ? ME.subj : '';
+  await Promise.all(GS.map(g=>loadData(g).catch(()=>null)));
+  if(mode!=='전담') return;
+  const A=window.PY_ALL||{};
+  let names=[...new Set(GS.flatMap(g=>(A[g]?.subjects||[]).map(x=>x.name)))];
+  const pr=n=>{ const i=PRIO.indexOf(n); return i<0?99:i; };
+  names.sort((a,b)=>pr(a)-pr(b));
+  if(!names.length){ box.innerHTML='<span class="sh">과목을 못 불러왔어요</span>'; return; }
+  if(!names.includes(pickS)) pickS='';
   box.innerHTML = names.map(n=>`<button data-s="${esc(n)}" class="${n===pickS?'on':''}">${esc(n)}</button>`).join('');
-  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ pickS=b.dataset.s; box.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); startLabel(); });
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ pickS=b.dataset.s; box.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderJ(); });
+  renderJ();
+}
+function jGrades(){ const A=window.PY_ALL||{}; return GS.filter(g=>(A[g]?.subjects||[]).some(x=>x.name===pickS)); }
+function renderJ(){
+  const box=$('jPick');
+  if(mode!=='전담' || !pickS){ box.hidden=true; startLabel(); return; }
+  const gs=jGrades();
+  box.hidden=false;
+  box.innerHTML = `<span class="lab">맡은 학급</span>` + gs.map(g=>{
+    const sel=pickSets[g]||[], mx=Math.max(6, pickMax[g]||0, ...sel), all=sel.length>=mx;
+    return `<div class="jrow"><b>${g}학년</b><button class="jall ${all?'on':''}" data-ja="${g}">전체</button>` +
+      [...Array(mx).keys()].map(i=>`<button class="jc ${sel.includes(i+1)?'on':''}" data-g="${g}" data-c="${i+1}" aria-pressed="${sel.includes(i+1)}">${i+1}</button>`).join('') +
+      `<button class="jadd" data-jp="${g}" title="${g}학년 반 하나 더">+</button></div>`;
+  }).join('');
+  const mxOf=g=>Math.max(6, pickMax[g]||0, ...(pickSets[g]||[]));
+  box.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{ const g=+b.dataset.g, c=+b.dataset.c, a=pickSets[g]||[];
+    pickSets[g] = a.includes(c) ? a.filter(x=>x!==c) : [...a,c].sort((x,y)=>x-y); renderJ(); });
+  box.querySelectorAll('[data-ja]').forEach(b=>b.onclick=()=>{ const g=+b.dataset.ja, mx=mxOf(g);
+    pickSets[g] = (pickSets[g]||[]).length>=mx ? [] : [...Array(mx).keys()].map(i=>i+1); renderJ(); });
+  box.querySelectorAll('[data-jp]').forEach(b=>b.onclick=()=>{ const g=+b.dataset.jp; pickMax[g]=Math.min(15, mxOf(g)+1); renderJ(); });
   startLabel();
 }
+function jPicked(){ const gs=jGrades(), out={}; for(const g of gs){ const a=(pickSets[g]||[]).filter(c=>c>=1); if(a.length) out[g]=[...a].sort((x,y)=>x-y); } return out; }
 function selectG(g){
+  if(mode==='전담') return;
   pickG=g; document.querySelectorAll('#gseg button').forEach(b=>b.classList.toggle('on', +b.dataset.g===g));
   if(mode==='담임'){
     let st=null; try{ st=JSON.parse(localStorage.getItem(keyOf(g, +$('cls').value||1))); }catch(e){}
     if(st) $('num').value = st.num;
   }
-  fillSubjects(g); startLabel();
+  startLabel();
 }
 function startLabel(){
   const b=$('startBtn');
+  if(mode==='전담'){
+    if(!pickS){ b.disabled=true; b.textContent='맡은 과목을 골라 주세요'; return; }
+    const P=jPicked(), k=Object.values(P).reduce((t,a)=>t+a.length,0);
+    if(!k){ b.disabled=true; b.textContent='맡은 학급을 골라 주세요'; return; }
+    b.disabled=false; b.innerHTML=`${esc(pickS)} · ${k}개 학급으로 시작 <svg><use href="#i-play"/></svg>`; return;
+  }
   if(!pickG){ b.disabled=true; b.textContent='학년을 골라 주세요'; return; }
-  if(mode==='전담' && !pickS){ b.disabled=true; b.textContent='맡은 과목을 골라 주세요'; return; }
   b.disabled=false;
   const c=+$('cls').value||1, n=+$('num').value||25;
-  b.innerHTML = mode==='전담' ? `${pickG}학년 ${esc(pickS)} · ${c}개 반으로 시작 <svg><use href="#i-play"/></svg>` : `${pickG}학년 ${c}반 · ${n}명으로 시작 <svg><use href="#i-play"/></svg>`;
+  b.innerHTML = `${pickG}학년 ${c}반 · ${n}명으로 시작 <svg><use href="#i-play"/></svg>`;
 }
 document.querySelectorAll('#mseg button').forEach(b => b.onclick = () => setMode(b.dataset.m));
 document.querySelectorAll('#gseg button').forEach(b => b.onclick = () => selectG(+b.dataset.g));
 $('startBtn').onclick = async () => {
-  if(!pickG || (mode==='전담' && !pickS)) return;
   const c=Math.max(1,Math.min(20,+$('cls').value||1)), num=Math.max(1,Math.min(40,+$('num').value||25));
+  let want=pickG;
   if(mode==='전담'){
-    const same = ME.mode==='전담' && ME.g===pickG && ME.subj===pickS;
-    ME = {mode:'전담', g:pickG, subj:pickS, classes:c, num, cls: same && ME.cls<=c ? ME.cls : 1};
-    saveMe(); await boot(pickG, ME.cls, num);
+    const sets=jPicked(), L=Object.keys(sets).map(Number).sort((a,b)=>a-b).flatMap(g=>sets[g].map(cc=>({g,c:cc})));
+    if(!pickS || !L.length) return;
+    const old = ME.mode==='전담' && ME.subj===pickS && ME.cur && (sets[ME.cur.g]||[]).includes(ME.cur.c) ? ME.cur : null;
+    const cur = old || L[0];
+    ME = {mode:'전담', subj:pickS, sets, max:{...pickMax}, num, cur};
+    saveMe(); await boot(cur.g, cur.c, num); want=cur.g;
   } else {
+    if(!pickG) return;
     ME = {mode:'담임', g:pickG, cls:c, num}; saveMe(); await boot(pickG, c, num);
     if(S.num!==num){ S.num=num; S.gen={}; save(); }
   }
-  if(!D || G!==pickG) return;
+  if(!D || G!==want) return;
   $('start').hidden=true; $('main').hidden=false; render(); window.scrollTo(0,0);
 };
 $('backBtn').onclick = () => { if(running) running.skip=true; save(); $('main').hidden=true; $('start').hidden=false; setMode(ME.mode||'담임'); selectG(G); };
 if(!$('num').value) $('num').value = ME.num || 25;
 setMode(mode);
-if(ME.g) selectG(ME.g);
+if(ME.mode!=='전담' && ME.g) selectG(ME.g);
 </script>
 </body>
 </html>
