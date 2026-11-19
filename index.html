@@ -402,13 +402,35 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 body.dropping::after{content:"여기에 놓으면 나이스 파일을 한꺼번에 읽어요 · 파일 이름은 상관없어요";position:fixed;inset:12px;z-index:60;display:grid;place-items:center;border:3px dashed var(--ink2);border-radius:var(--r3);background:color-mix(in srgb,var(--bg) 88%,transparent);font-size:20px;font-weight:800;color:var(--ink);pointer-events:none}
 /* 학생별로 고른 성취기준 (칸 빈 곳 누르기) */
 :root{ --own:#fbe7a1; --ownb:#c99a12 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --own:#3d3313; --ownb:#d9b03c } }
-.g tr[data-r] td.lv{cursor:pointer;padding-left:12px;padding-right:12px}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --own:#4a3c12; --ownb:#d9b03c } }
+.g tr[data-r] td.lv{cursor:pointer;padding-left:9px;padding-right:9px}
 .g tr[data-r] td.lv:hover{background:var(--soft)}
 .g tr[data-r] td.lv.own,.g tr.working td.lv.own{background:var(--own)!important;box-shadow:inset 0 0 0 2px var(--ownb)}
+.g tr[data-r] td.lv.auto{background:color-mix(in srgb,var(--own) 45%,transparent)}
 .meta .own{color:var(--ink2);font-weight:700}
+.meta .own.auto{font-weight:600;color:var(--sub)}
+.meta .own.auto i{background:color-mix(in srgb,var(--own) 45%,transparent);box-shadow:none}
+/* 스크롤 내리면 위쪽을 한 줄로 (11/19 사용자) */
+body.scrolled .appbar{position:relative}
+@media (min-width:721px){
+  body.scrolled .tool{top:0}
+  body.scrolled .g thead th{top:calc(var(--toolh,0px) - 1px)}
+  .tool.compact{flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;gap:8px 14px!important;padding:8px 16px!important;border-top-left-radius:0;border-top-right-radius:0}
+  .tool.compact .trow{flex:0 0 auto}
+  .tool.compact .srow,.tool.compact .sl,.tool.compact .focus,.tool.compact #resetBtn{display:none!important}
+  .tool.compact .title b{font-size:16px}
+  .tool.compact .stepbtns{margin-left:auto;flex-wrap:nowrap;gap:8px!important}
+  .tool.compact .sb + .sb::before{display:none}
+  .tool.compact .btn{padding-top:6px;padding-bottom:6px}
+}
 .meta .own i{font-style:normal;display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--own);box-shadow:inset 0 0 0 1.5px var(--ownb);margin-right:4px;vertical-align:-1px}
 @media (max-width:720px){ .g tr[data-r] td.lv{padding:8px 8px} }
+/* 노트북 폭에서 표가 오른쪽으로 넘치지 않게: 평어 칸을 줄이고 행 단추를 세로로 */
+@media (min-width:721px) and (max-width:1500px){
+  .g td.txt{min-width:260px}
+  .rowact{flex-direction:column}
+  .rowact button+button{border-left:0;border-top:1px solid var(--line2)}
+}
 </style>
 </head>
 <body>
@@ -607,7 +629,10 @@ function textOf(n, pick){
   const s=subj(), m=marks(n);
   return chosen(n).map(i => s.items[i].v[m[i]][pick[n][i]]).join(' ');
 }
-function ownTag(n){ const s=subj(), m=marks(n), o=ownOf(n).filter(i=>m[i]>=0).sort((a,b)=>a-b); return o.length?` · <span class="own"><i></i>고름: ${o.map(i=>esc(s.items[i].code)).join('·')}</span>`:''; }
+// 자동으로 고른 성취기준: 직접 고른 게 없고, ◎○△ 있는 것 중 일부만 들어갈 때 (전부 들어가면 표시 안 함)
+function autoOf(n){ const s=subj(), m=marks(n); if(ownOf(n).some(i=>m[i]>=0)) return []; const ch=chosen(n), mk=m.slice(0,s.items.length).filter(x=>x>=0).length; return ch.length && ch.length<mk ? ch : []; }
+function ownTag(n){ const s=subj(), m=marks(n), o=ownOf(n).filter(i=>m[i]>=0).sort((a,b)=>a-b), a=autoOf(n); const L=x=>x.map(i=>esc(s.items[i].code)).join('·');
+  return o.length?` · <span class="own"><i></i>고름: ${L(o)}</span>`:(a.length?` · <span class="own auto"><i></i>자동: ${L(a)}</span>`:''); }
 function neisBytes(t){ let b=0; for(const ch of t){ b += ch==='\n'?2:(ch.charCodeAt(0)<128?1:3); } return b; }
 
 /* ---- 그리기 ---- */
@@ -635,9 +660,9 @@ function render(){
   let h = `<thead><tr><th>번호</th>${s.items.map(it=>`<th class="code" title="${esc(it.std)}">${esc(it.code)}<span>${esc(it.area)}</span></th>`).join('')}<th style="text-align:left">평어</th><th></th></tr></thead><tbody>`;
   h += `<tr class="all"><td class="no">전체</td>${s.items.map((it,i)=>`<td class="lv" data-c="${esc(it.code)}">${segHTML(-1,`data-all="${i}"`)}</td>`).join('')}<td class="txt">누르면 그 성취기준을 반 전체에 넣어요. 대부분 ○로 채우고 다른 학생만 바꾸면 빨라요. 학생 칸의 빈 곳을 누르면 그 학생 평어에 넣을 성취기준을 고를 수 있어요 (최대 ${MAXS}개).</td><td></td></tr>`;
   for(let n=1;n<=N;n++){
-    const m=marks(n), t=textOf(n,pick), miss=m.filter(x=>x<0).length, own=ownOf(n);
+    const m=marks(n), t=textOf(n,pick), miss=m.filter(x=>x<0).length, own=ownOf(n).filter(i=>m[i]>=0), au=autoOf(n);
     const show = gen && t;
-    h += `<tr data-r="${n}" class="${gen&&!t?'skip':''}"><td class="no">${n}</td>${s.items.map((it,i)=>`<td class="lv${own.includes(i)?' own':''}" data-c="${esc(it.code)}" data-on="${n}" data-oi="${i}" title="빈 곳을 누르면 이 학생 평어에 넣을 성취기준으로 골라요 (최대 ${MAXS}개)">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
+    h += `<tr data-r="${n}" class="${gen&&!t?'skip':''}"><td class="no">${n}</td>${s.items.map((it,i)=>`<td class="lv${own.includes(i)?' own':(au.includes(i)?' auto':'')}" data-c="${esc(it.code)}" data-on="${n}" data-oi="${i}" title="빈 곳을 누르면 이 학생 평어에 넣을 성취기준으로 골라요 (최대 ${MAXS}개)">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
       <td class="txt">${show?`<div class="t">${esc(t)}</div><div class="meta">${t.length}자 · ${neisBytes(t)}바이트${ownTag(n)}${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`:(gen&&!t ? `<div class="t skip">◎○△가 없어 건너뛰었어요</div>` : `<div class="t ${t?'wait':'empty'}">${t?'평어 만들기를 누르면 나와요':'◎○△를 누르세요'}</div>`)}</td>
       <td class="act">${show?`<span class="rowact"><button data-alt="${n}" title="같은 ◎○△로 다른 문장"><svg><use href="#i-reset"/></svg>다른 문장</button><button data-copy="${n}" title="이 학생 평어 복사"><svg><use href="#i-copy"/></svg>복사</button></span>`:''}</td></tr>`;
   }
@@ -871,7 +896,7 @@ async function generate(){
   render(); toast(`${s.name} ${rows.length}명 평어를 만들었어요`);
 }
 $('genBtn').onclick = generate;
-new IntersectionObserver(([e]) => { const c = innerWidth>720 && !e.isIntersecting && e.boundingClientRect.top < 0; $('tool').classList.toggle('compact', c); }, {rootMargin:`-${58+12}px 0px 0px 0px`}).observe($('toolSentinel'));
+new IntersectionObserver(([e]) => { const down = !e.isIntersecting && e.boundingClientRect.top < 0; document.body.classList.toggle('scrolled', down); $('tool').classList.toggle('compact', down && innerWidth>720); }, {rootMargin:`-${58+12}px 0px 0px 0px`}).observe($('toolSentinel'));
 new ResizeObserver(() => document.documentElement.style.setProperty('--toolh', $('tool').offsetHeight + 'px')).observe($('tool'));
 $('numIn').onchange = e => { if(running){ e.target.value=S.num; return; } S.num=Math.max(1,Math.min(40,+e.target.value||S.num)); if(S.gen) S.gen={}; save(); render(); };
 $('skipBtn').onclick = () => { if(running) running.skip=true; };
