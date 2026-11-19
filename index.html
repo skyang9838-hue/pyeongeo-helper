@@ -76,6 +76,34 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 .t.empty{color:var(--sub);font-size:13px}
 .meta{font-size:12px;color:var(--sub);margin-top:3px}
 .meta .w{color:var(--warn)}
+.start{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.start[hidden]{display:none}
+.start-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px 30px;width:min(520px,100%);box-shadow:0 18px 50px -30px rgba(0,0,0,.35)}
+.start-card h1{font-size:28px}
+.start-sub{color:var(--sub);margin:6px 0 24px}
+.field{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:16px}
+.field>span{width:64px;color:var(--sub);font-size:14px;flex:none}
+.field input{width:84px;font:inherit;font-size:18px;text-align:center;padding:8px 6px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.gseg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;flex:1}
+.gseg button{font:inherit;font-size:15px;font-weight:700;padding:10px 0;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer}
+.gseg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.big{width:100%;font-size:17px;font-weight:700;padding:13px;margin-top:12px;border-radius:12px}
+.btn:disabled{opacity:.4;cursor:default}
+.start-safe{font-size:12.5px;color:var(--sub);margin:16px 0 0;text-align:center}
+#who{font-size:16px}
+.prog{display:flex;align-items:center;gap:12px;background:var(--accent-soft);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:14px;position:sticky;top:52px;z-index:6}
+.prog[hidden]{display:none}
+.prog-bar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.prog-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.g tr.working td{background:var(--accent-soft)}
+.g td.act.hide>*{opacity:0;pointer-events:none}
+.g td.lv.pick .seg{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent)}
+.steps{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sub)}
+.steps .st{padding:2px 8px;border-radius:99px;background:var(--soft);border:1px solid var(--line)}
+.steps .st.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.t.wait{color:var(--sub);font-size:13px}
+.t.pop{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none;font-size:14px;z-index:9}
 .toast.show{opacity:1;transform:translateX(-50%)}
 .guide{font-size:13px;color:var(--sub);margin:14px 0 40px;line-height:1.7}
@@ -83,14 +111,21 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 </style>
 </head>
 <body>
-<div class="wrap">
+<section id="start" class="start">
+  <div class="start-card">
+    <h1>성적 평어 도우미</h1>
+    <p class="start-sub">2학기 교과 평어 · 우리 학년 평가계획으로 만들어요</p>
+    <div class="field"><span>학년</span><div class="gseg" id="gseg"><button data-g="1">1학년</button><button data-g="2">2학년</button><button data-g="3">3학년</button><button data-g="4">4학년</button><button data-g="5">5학년</button><button data-g="6">6학년</button></div></div>
+    <div class="field"><span>반</span><input type="number" id="cls" min="1" max="20" inputmode="numeric"> 반</div>
+    <div class="field"><span>학생 수</span><input type="number" id="num" min="1" max="40" inputmode="numeric"> 명</div>
+    <button class="btn primary big" id="startBtn" disabled>시작하기 ▶</button>
+    <p class="start-safe">🔒 이름은 받지 않고 번호로만 다뤄요. 고른 것은 이 컴퓨터 브라우저에만 저장돼요.</p>
+  </div>
+</section>
+<div class="wrap" id="main" hidden>
   <header>
     <h1>성적 평어 도우미<small id="sub">2학기</small></h1>
-    <div class="cls">
-      <select id="grade" aria-label="학년"><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option></select><input type="number" id="cls" min="1" max="20" aria-label="반"><b>반</b>
-      <span style="width:6px"></span>
-      학생<input type="number" id="num" min="1" max="40" aria-label="학생 수">명
-    </div>
+    <div class="cls"><b id="who"></b><button class="btn small" id="backBtn">학년·반 바꾸기</button></div>
   </header>
   <details class="safe-box">
     <summary>🔒 <b>학생 정보는 이 컴퓨터 밖으로 나가지 않아요</b> <span>자세히</span></summary>
@@ -105,12 +140,14 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 
   <nav class="tabs" id="tabs"></nav>
 
+  <div class="prog" id="prog" hidden><div class="prog-bar"><i id="progFill"></i></div><span id="progTxt"></span><button class="btn small" id="skipBtn">바로 보기</button></div>
   <div class="bar">
     <span class="note" id="status"></span>
     <div class="right">
       <button class="btn" id="neisBtn" title="나이스 [교과평가(교과별)] 엑셀을 넣으면 ◎○△가 채워져요">나이스 파일 넣기</button><input type="file" id="neisFile" accept=".xlsx,.xls" hidden>
+      <button class="btn primary" id="genBtn">평어 만들기 ▶</button>
       <button class="btn" id="copyTsv">엑셀용 복사</button>
-      <button class="btn primary" id="copyAll">이 과목 전체 복사</button>
+      <button class="btn" id="copyAll">이 과목 전체 복사</button>
     </div>
   </div>
 
@@ -119,7 +156,7 @@ table.g{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
   <div class="scroll"><table class="g" id="grid"></table></div>
 
   <p class="guide">
-    ◎○△를 누르거나, 나이스에서 내려받은 [교과평가(교과별)] 엑셀을 <b>나이스 파일 넣기</b>로 넣으면 평어가 바로 만들어져요(이름 칸은 읽지 않아요). 성취기준이 3개보다 많은 과목은 학생마다 3개를 골라 3문장으로 써요(반 안에서 영역이 고르게 돌아가요). 같은 반에서 평어가 똑같은 학생은 생기지 않게 문장을 골라 줘요. 마음에 안 들면 <b>다른 문장</b>을 누르세요.<br>
+    ◎○△를 누르거나, 나이스에서 내려받은 [교과평가(교과별)] 엑셀을 <b>나이스 파일 넣기</b>로 넣은 뒤 <b>평어 만들기</b>를 누르면 번호 차례로 평어가 만들어져요(이름 칸은 읽지 않아요). ◎○△를 바꾸면 다시 눌러 주세요. 성취기준이 3개보다 많은 과목은 학생마다 3개를 골라 3문장으로 써요(반 안에서 영역이 고르게 돌아가요). 같은 반에서 평어가 똑같은 학생은 생기지 않게 문장을 골라 줘요. 마음에 안 들면 <b>다른 문장</b>을 누르세요.<br>
     나이스 <b>학기말 종합의견</b>에 넣고 2학기에 체크한 뒤 일괄저장하세요 (교과학습발달상황에 바로 넣으면 2학기 성적이 빠진 것으로 나와요). 바이트는 나이스 방식(한글 3, 영문·숫자·공백 1)으로 셌어요.
   </p>
 </div>
@@ -213,6 +250,7 @@ function assign(){
   count();
   return {pick, use};
 }
+function ungen(){ if(S.gen) S.gen[subj().name]=false; }
 function textOf(n, pick){
   const s=subj(), m=marks(n);
   return chosen(n).map(i => s.items[i].v[m[i]][pick[n][i]]).join(' ');
@@ -234,33 +272,37 @@ function renderStd(){
 }
 function segHTML(picked, attrs){ return `<span class="seg">${LV.map((l,k)=>`<button class="${picked===k?'on l'+k:''}" ${attrs} data-k="${k}" title="${l}">${l}</button>`).join('')}</span>`; }
 function render(){
-  $('cls').value=S.cls; $('num').value=S.num;
+  $('who').textContent = `${G}학년 ${S.cls}반 · ${S.num}명`;
   renderTabs(); renderStd();
+  const gen = !!(S.gen && S.gen[subj().name]);
   const s=subj(), N=S.num, {pick, use}=assign();
   let h = `<thead><tr><th>번호</th>${s.items.map(it=>`<th class="code" title="${esc(it.std)}">${esc(it.code)}<span>${esc(it.area)}</span></th>`).join('')}<th style="text-align:left">평어</th><th></th></tr></thead><tbody>`;
   h += `<tr class="all"><td class="no">전체</td>${s.items.map((_,i)=>`<td class="lv">${segHTML(-1,`data-all="${i}"`)}</td>`).join('')}<td class="txt">누르면 그 성취기준을 반 전체에 넣어요. 대부분 ○로 채우고 다른 학생만 바꾸면 빨라요.</td><td></td></tr>`;
   for(let n=1;n<=N;n++){
     const m=marks(n), t=textOf(n,pick), miss=m.filter(x=>x<0).length;
-    h += `<tr><td class="no">${n}</td>${s.items.map((_,i)=>`<td class="lv">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
-      <td class="txt"><div class="t ${t?'':'empty'}">${t?esc(t):'◎○△를 누르세요'}</div>${t?`<div class="meta">${t.length}자 · ${neisBytes(t)}바이트${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`:''}</td>
-      <td class="act">${t?`<button class="btn small" data-alt="${n}">다른 문장</button> <button class="btn small" data-copy="${n}">복사</button>`:''}</td></tr>`;
+    const show = gen && t;
+    h += `<tr data-r="${n}"><td class="no">${n}</td>${s.items.map((_,i)=>`<td class="lv">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
+      <td class="txt">${show?`<div class="t">${esc(t)}</div><div class="meta">${t.length}자 · ${neisBytes(t)}바이트${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`:`<div class="t ${t?'wait':'empty'}">${t?'평어 만들기를 누르면 나와요':'◎○△를 누르세요'}</div>`}</td>
+      <td class="act">${show?`<button class="btn small" data-alt="${n}">다른 문장</button> <button class="btn small" data-copy="${n}">복사</button>`:''}</td></tr>`;
   }
   h += `</tbody>`;
   $('grid').innerHTML = h;
   let filled=0; for(let n=1;n<=N;n++) if(textOf(n,pick)) filled++;
-  $('status').innerHTML = `${esc(s.name)} · 성취기준 ${s.items.length}개${s.items.length>MAXS?` 중 학생마다 ${MAXS}개`:''} · 평어 ${filled}/${N}명` + (filled>1?' · 반 안에서 모두 서로 달라요':'');
+  $('status').innerHTML = `${esc(s.name)} · 성취기준 ${s.items.length}개${s.items.length>MAXS?` 중 학생마다 ${MAXS}개`:''} · ◎○△ 넣은 학생 ${filled}/${N}명` + (gen&&filled>1?' · 평어는 반 안에서 모두 서로 달라요':'');
+  $('genBtn').textContent = gen ? '평어 다시 만들기 ↻' : '평어 만들기 ▶';
+  $('genBtn').disabled = !filled || !!running; $('copyAll').disabled = $('copyTsv').disabled = !gen;
   bind(pick);
 }
 function bind(pick){
   const s=subj();
   $('grid').querySelectorAll('button[data-n]').forEach(b => b.onclick = () => {
     const m=marks(+b.dataset.n), i=+b.dataset.i, k=+b.dataset.k;
-    m[i] = m[i]===k ? -1 : k; save(); render();
+    m[i] = m[i]===k ? -1 : k; ungen(); save(); render();
   });
   $('grid').querySelectorAll('button[data-all]').forEach(b => b.onclick = () => {
     const i=+b.dataset.all, k=+b.dataset.k;
     for(let n=1;n<=S.num;n++) marks(n)[i]=k;
-    save(); render(); toast(`${s.items[i].code} 전체를 ${LV[k]}로 넣었어요`);
+    ungen(); save(); render(); toast(`${s.items[i].code} 전체를 ${LV[k]}로 넣었어요`);
   });
   $('grid').querySelectorAll('[data-alt]').forEach(b => b.onclick = () => {
     const n=b.dataset.alt; S.salt[s.name] ||= {}; S.salt[s.name][n]=(S.salt[s.name][n]||0)+1; save(); render();
@@ -311,7 +353,7 @@ async function importNeis(file){
   const {title, out}=parseNeis(rows);
   if(!out.length){ toast('◎○△ 줄을 못 찾았어요. 나이스 [교과평가(교과별)] 엑셀인지 확인해 주세요'); return; }
   const m=title.match(/(\d)\s*학년\s*(\d+)\s*반/);
-  if(m && +m[1]!==G){ await boot(+m[1]); }
+  if(m && +m[1]!==G){ toast(`${m[1]}학년 파일이에요. 처음 화면에서 ${m[1]}학년을 골라 주세요`); return; }
   // 과목 찾기: 줄이 가장 많이 맞는 과목
   let bestS=null, bestHit=-1;
   for(const sj of D.subjects){ const hit=out.filter(r=>matchItem(sj,r)>=0).length; if(hit>bestHit){ bestHit=hit; bestS=sj; } }
@@ -321,7 +363,7 @@ async function importNeis(file){
   const maxN=Math.max(...out.map(r=>r.n)); if(maxN>S.num) S.num=Math.min(40,maxN);
   let filled=0, miss=0; const ns=new Set();
   for(const r of out){ const i=matchItem(bestS,r); if(i<0){ miss++; continue; } marks(r.n)[i]=r.k; filled++; ns.add(r.n); }
-  save(); render();
+  ungen(); save(); render();
   toast(`${bestS.name} ${ns.size}명 · ◎○△ ${filled}칸을 채웠어요${miss?` (못 맞춘 줄 ${miss}개)`:''}`);
 }
 let wipeArmed=false;
@@ -329,14 +371,54 @@ $('wipeAll').onclick = () => {
   if(!wipeArmed){ wipeArmed=true; $('wipeAll').textContent='정말 지울까요? 한 번 더 누르기'; return; }
   try{ Object.keys(localStorage).filter(k=>k.startsWith('pyeongeo')).forEach(k=>localStorage.removeItem(k)); }catch(e){}
   wipeArmed=false; $('wipeAll').textContent='이 컴퓨터에 저장된 것 지우기';
-  S=null; boot(G); toast('이 컴퓨터에 저장된 것을 모두 지웠어요');
+  S=null; $('main').hidden=true; $('start').hidden=false; pickG=0; document.querySelectorAll('#gseg button').forEach(b=>b.classList.remove('on')); $('startBtn').disabled=true; $('cls').value=1; $('num').value=25; toast('이 컴퓨터에 저장된 것을 모두 지웠어요');
 };
 $('neisBtn').onclick = () => $('neisFile').click();
 $('neisFile').onchange = e => { const f=e.target.files[0]; e.target.value=''; if(f) importNeis(f); };
+/* ---- 평어 만들기: 번호 차례로 성취기준 고르기 → 문장 쓰기 → 완성 ---- */
+let running = null;
+const wait = ms => new Promise(r => setTimeout(r, ms));
+async function generate(){
+  if(running) return;
+  const s=subj(); S.gen ||= {}; S.gen[s.name]=true; save();
+  const {pick}=assign();
+  render();
+  const rows=[]; for(let n=1;n<=S.num;n++) if(textOf(n,pick)) rows.push(n);
+  // 화면의 평어를 모두 감추고 차례로 채운다
+  rows.forEach(n => { const tr=$('grid').querySelector(`tr[data-r="${n}"]`); tr.querySelector('.txt').innerHTML='<div class="t wait">기다리는 중…</div>'; tr.querySelector('.act').classList.add('hide'); });
+  const token = running = {skip:false};
+  $('prog').hidden=false; $('genBtn').disabled=true;
+  const fast = () => token.skip;
+  for(let k=0;k<rows.length;k++){
+    const n=rows[k], tr=$('grid').querySelector(`tr[data-r="${n}"]`); if(!tr) break;
+    $('progFill').style.width = `${(k/rows.length)*100}%`; $('progTxt').textContent = `${n}번 만드는 중 · ${k+1}/${rows.length}`;
+    const txt=tr.querySelector('.txt'), ch=chosen(n), m=marks(n), full=textOf(n,pick);
+    if(!fast()){
+      tr.classList.add('working'); tr.scrollIntoView({block:'center'});
+      // 1단계: 넣을 성취기준 고르기
+      txt.innerHTML = `<div class="steps">${ch.map(i=>`<span class="st" data-i="${i}">${esc(s.items[i].code)} ${LV[m[i]]}</span>`).join('')}<span class="st" data-s="w">문장 고르는 중</span></div>`;
+      for(const i of ch){ tr.querySelectorAll('td.lv')[i].classList.add('pick'); txt.querySelector(`.st[data-i="${i}"]`).classList.add('on'); await wait(60); if(fast()) break; }
+      if(!fast()){ txt.querySelector('.st[data-s="w"]').classList.add('on'); await wait(70); }
+      // 2단계: 문장 쓰기
+      if(!fast()){
+        txt.innerHTML = '<div class="t"></div>'; const t=txt.firstChild; const step=Math.ceil(full.length/8);
+        for(let c=step;c<full.length+step && !fast();c+=step){ t.textContent=full.slice(0,c); await wait(14); }
+      }
+      tr.querySelectorAll('td.lv.pick').forEach(td=>td.classList.remove('pick')); tr.classList.remove('working');
+    }
+    const miss=m.filter(x=>x<0).length;
+    txt.innerHTML = `<div class="t pop">${esc(full)}</div><div class="meta">${full.length}자 · ${neisBytes(full)}바이트${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`;
+    tr.querySelector('.act').classList.remove('hide');
+  }
+  $('progFill').style.width='100%'; $('progTxt').textContent=`${rows.length}명 평어 완성!`;
+  await wait(fast()?200:900);
+  $('prog').hidden=true; running=null;
+  render(); toast(`${s.name} ${rows.length}명 평어를 만들었어요`);
+}
+$('genBtn').onclick = generate;
+$('skipBtn').onclick = () => { if(running) running.skip=true; };
 $('copyAll').onclick = () => { const {pick}=assign(); const L=[]; for(let n=1;n<=S.num;n++) L.push(`${n}. ${textOf(n,pick)}`); copy(L.join('\n'), `${S.subj} 전체 복사했어요`); };
 $('copyTsv').onclick = () => { const {pick}=assign(); const L=[`번호\t${S.subj}`]; for(let n=1;n<=S.num;n++) L.push(`${n}\t${textOf(n,pick)}`); copy(L.join('\n'), '엑셀에 붙이면 번호·평어 두 칸으로 들어가요'); };
-$('cls').onchange = e => { S.cls = Math.max(1, Math.min(20, +e.target.value||1)); save(); render(); };
-$('num').onchange = e => { S.num = Math.max(1, Math.min(40, +e.target.value||1)); save(); render(); };
 /* ---- 학년 고르기: 학년마다 데이터 파일·저장을 따로 ---- */
 function loadData(g){
   return new Promise((ok, no) => {
@@ -352,13 +434,31 @@ async function boot(g){
   try { localStorage.setItem('pyeongeo-grade', g); } catch(e) {}
   S = load() || {cls:1, num:25, subj:D.subjects[0].name, marks:{}, salt:{}};
   if (!D.subjects.some(x => x.name === S.subj)) S.subj = D.subjects[0].name;
-  $('grade').value = g; $('sub').textContent = D.title;
+  $('sub').textContent = D.title;
   document.title = `성적 평어 도우미 · ${D.title}`;
-  render();
+  if(!$('main').hidden) render();
 }
-$('grade').onchange = e => boot(+e.target.value);
-let g0 = 6; try { g0 = +localStorage.getItem('pyeongeo-grade') || 6; } catch(e) {}
-boot(g0);
+/* ---- 시작 화면: 학년·반·학생 수를 고르고 들어간다 (들어가면 그 학년만 보임) ---- */
+let pickG = 0;
+function peek(g){ try{ return JSON.parse(localStorage.getItem(`pyeongeo-g${g}-2`)); }catch(e){ return null; } }
+function selectG(g){
+  pickG=g; document.querySelectorAll('#gseg button').forEach(b=>b.classList.toggle('on', +b.dataset.g===g));
+  const p=peek(g); $('cls').value = p ? p.cls : ($('cls').value||1); $('num').value = p ? p.num : ($('num').value||25);
+  $('startBtn').disabled=false;
+}
+document.querySelectorAll('#gseg button').forEach(b => b.onclick = () => selectG(+b.dataset.g));
+$('startBtn').onclick = async () => {
+  if(!pickG) return;
+  const cls=Math.max(1,Math.min(20,+$('cls').value||1)), num=Math.max(1,Math.min(40,+$('num').value||25));
+  await boot(pickG); if(!D || G!==pickG) return;
+  if(S.cls!==cls || S.num!==num){ S.cls=cls; S.num=num; S.gen={}; save(); }
+  $('start').hidden=true; $('main').hidden=false; render(); window.scrollTo(0,0);
+};
+$('backBtn').onclick = () => { if(running) running.skip=true; $('main').hidden=true; $('start').hidden=false; selectG(G); };
+if(!$('cls').value) $('cls').value=1;
+if(!$('num').value) $('num').value=25;
+let g0 = 0; try { g0 = +localStorage.getItem('pyeongeo-grade') || 0; } catch(e) {}
+if(g0) selectG(g0);
 </script>
 </body>
 </html>
