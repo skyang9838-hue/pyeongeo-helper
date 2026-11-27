@@ -611,18 +611,45 @@ function perm(n, key){ const r=rng(hash(key)); const a=[...Array(n).keys()]; for
 
 /* ---- 학생마다 넣을 성취기준 MAXS개: 반 안에서 고르게 돌아가도록 차례로 밀어 가며 고름 ---- */
 function focusOf(){ const s=subj(); return ((S.focus||{})[s.name]||[]).filter(i=>i<s.items.length); }
-function chosen(n){
-  const s=subj(), K=s.items.length, m=marks(n), F=focusOf();
-  const own=ownEff(n);   // 선생님이 직접 고른 것은 꼭 넣고, 남는 자리만 자동으로 채움 (11/27 사용자: 하나 고르면 자동 하나는 남게)
-  const marked=[...Array(K).keys()].filter(i=>m[i]>=0 && (!F.length || F.includes(i)) && !own.includes(i));
-  const need=MAXS-own.length; let out=[];
-  if(need>0){
-    if(marked.length<=need) out=marked;
-    else { const p=perm(K, `${S.cls}|${s.name}|sub`), start=((n-1)*MAXS + saltOf(n)) % K;
-      for(let k=0;k<K && out.length<need;k++){ const i=p[(start+k)%K]; if(marked.includes(i)) out.push(i); } }
+/* 학생 순서를 섞고, 덜 쓰인 성취기준·덜 나온 조합부터 고름 (11/27 사용자: 번호 차례로 밀면 홀짝마다 같은 묶음이 번갈아 나옴) */
+let selCache={key:'',v:null};
+function selectAll(){
+  const s=subj(), K=s.items.length, N=S.num, F=focusOf();
+  const key=JSON.stringify([G,S.cls,s.name,N,(S.marks||{})[s.name],(S.own||{})[s.name],F]);
+  if(selCache.key===key) return selCache.v;
+  const cnt=new Array(K).fill(0), pc={}, out={}, pk=(a,b)=>a<b?a+','+b:b+','+a;
+  const order=perm(N, `${S.cls}|${s.name}|ord`).map(x=>x+1), r=rng(hash(`${S.cls}|${s.name}|sel`));
+  for(const n of order){
+    const m=marks(n), own=[], need=MAXS;   // 자동 고르기는 직접 고른 것과 상관없이 먼저 정하고, 직접 고른 것은 아래에서 끼워 넣음
+    const cand=[...Array(K).keys()].filter(i=>m[i]>=0 && (!F.length || F.includes(i)));
+    let pick=[];
+    if(need<=0 || !cand.length) pick=[];
+    else if(cand.length<=need) pick=cand;
+    else if(need===2){
+      let best=null, bc=Infinity;
+      for(let a=0;a<cand.length;a++) for(let b=a+1;b<cand.length;b++){
+        const c=cnt[cand[a]]+cnt[cand[b]]+1.5*(pc[pk(cand[a],cand[b])]||0)+r()*0.9;
+        if(c<bc){ bc=c; best=[cand[a],cand[b]]; } }
+      pick=best;
+    } else {
+      const left=[...cand];
+      while(pick.length<need){ let bi=0, bc=Infinity; left.forEach((x,k)=>{ const c=cnt[x]+own.concat(pick).reduce((s2,y)=>s2+1.5*(pc[pk(x,y)]||0),0)+r()*0.9; if(c<bc){ bc=c; bi=k; } }); pick.push(left.splice(bi,1)[0]); }
+    }
+    pick.forEach(i=>cnt[i]++);
+    const all=[...own,...pick].sort((a,b)=>a-b);
+    for(let a=0;a<all.length;a++) for(let b=a+1;b<all.length;b++){ const k2=pk(all[a],all[b]); pc[k2]=(pc[k2]||0)+1; }
+    out[n]=all;
   }
-  return [...own, ...out].sort((a,b)=>a-b);
+  // 직접 고른 것: 그것을 넣고 자동으로 골랐던 것은 앞에서부터 남는 자리만큼 유지 (하나 고르면 자동 하나는 남음)
+  for(let n=1;n<=N;n++){
+    const own=ownEff(n); if(!own.length) continue;
+    const m=marks(n), keep=out[n].filter(i=>!own.includes(i));
+    const rest=[...Array(K).keys()].filter(i=>m[i]>=0 && (!F.length || F.includes(i)) && !own.includes(i) && !keep.includes(i));
+    out[n]=[...own, ...keep, ...rest].slice(0, Math.max(MAXS, own.length)).sort((a,b)=>a-b);
+  }
+  selCache={key, v:out}; return out;
 }
+function chosen(n){ return (selectAll()[n]||[]).slice(); }
 
 /* ---- 문장 배정: 같은 성취기준·수준끼리 돌려 쓰고, 평어 전체는 반 안에서 겹치지 않게 ---- */
 function assign(){
@@ -634,8 +661,8 @@ function assign(){
     [0,1,2].forEach(L => {
       const V = it.v[L].length, p = perm(V, `${S.cls}|${s.name}|${i}|${L}`);
       let k=0;
-      // 한 바퀴(V명)를 돌 때마다 성취기준마다 다른 폭으로 밀어서, 1번과 11번이 같은 문장 묶음을 받지 않게 함
-      for(let n=1;n<=N;n++){ if(marks(n)[i]===L){ (pick[n] ||= [])[i] = p[(k + Math.floor(k / V) * (i + 1)) % V]; k++; } }
+      // 같은 칸 학생이 문장 수(V)보다 많으면 V명 뒤에 다시 쓰여 같은 문장이 가장 멀리 떨어지게 (11/27). 평어 전체가 겹치면 아래 3)에서 밀어 냄
+      for(let n=1;n<=N;n++){ if(marks(n)[i]===L){ (pick[n] ||= [])[i] = p[k % V]; k++; } }
     });
   });
   for(let n=1;n<=N;n++){ pick[n] ||= []; }
@@ -666,7 +693,9 @@ function assign(){
       outer: for(let i=0;i<K;i++){
         if(!ch.has(i)) continue;
         const L=m[i], V=s.items[i].v[L].length;
-        const order=[...Array(V).keys()].sort((a,b)=>use[i][L][a]-use[i][L][b]);
+        // 덜 쓰인 문장부터, 같으면 그 문장을 쓰는 학생과 번호가 먼 것부터 (11/27: 옆 번호끼리 같은 문장이 붙지 않게)
+        const near=v=>{ let d=99; for(let q=1;q<=N;q++){ if(q!==n && marks(q)[i]===L && pick[q][i]===v) d=Math.min(d,Math.abs(q-n)); } return d; };
+        const order=[...Array(V).keys()].sort((a,b)=>(use[i][L][a]-use[i][L][b]) || (near(b)-near(a)));
         for(const v of order){
           const old=pick[n][i]; pick[n][i]=v;
           const k2 = pick[n].map((vv,j)=>!ch.has(j)?'-':j+':'+m[j]+':'+vv).join('|');
