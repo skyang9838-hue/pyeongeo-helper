@@ -435,6 +435,18 @@ body.scrolled .appbar{position:relative}
 .jrow .jall{padding:0 9px;margin-right:2px}
 .jrow .jadd{border-style:dashed;color:var(--sub)}
 .tabs .tsep{width:1px;align-self:stretch;background:var(--line2);margin:8px 2px;flex:none}
+/* 스크롤해도 과목 탭이 위에 붙어 있게 (11/27 사용자) */
+.tabs{position:sticky;top:var(--ab);z-index:16;box-shadow:0 6px 12px -10px rgba(0,0,0,.25)}
+body.scrolled .tabs{top:0;border-top-left-radius:0;border-top-right-radius:0}
+body.scrolled .tab{padding:6px 14px 9px}
+body.scrolled .tab .cnt{display:inline;margin:0 0 0 6px}
+body.scrolled .tab .pbar{bottom:4px}
+@media (min-width:721px){
+  .tool{top:calc(var(--ab) + var(--tabsh,0px))}
+  .g thead th{top:calc(var(--ab) + var(--tabsh,0px) + var(--toolh,0px) - 1px)}
+  body.scrolled .tool{top:var(--tabsh,0px);border-top-left-radius:0;border-top-right-radius:0}
+  body.scrolled .g thead th{top:calc(var(--tabsh,0px) + var(--toolh,0px) - 1px)}
+}
 /* 나이스 파일 몽땅 넣기 창 (11/19 사용자) */
 .dlg{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px}
 .dlg-card{background:var(--paper);color:var(--ink);border-radius:var(--r3);max-width:580px;width:100%;padding:24px;position:relative;box-shadow:0 20px 60px -20px rgba(0,0,0,.5);max-height:90vh;overflow:auto}
@@ -541,7 +553,7 @@ body.scrolled .appbar{position:relative}
       <div class="stepbtns" id="flow">
         <div class="sb" data-k="1"><span class="sl"><i>1</i><em>◎○△ 넣기 <small>표에서 누르거나 파일을 끌어다 놓기</small></em></span><button class="btn" id="neisBtn" title="나이스 [교과평가(교과별)] 엑셀을 여러 과목·여러 반 한꺼번에 골라 넣으면 알아서 채워요. 표에서 직접 눌러도 돼요"><svg><use href="#i-up"/></svg>나이스 파일로 한 번에 넣기</button><input type="file" id="neisFile" accept=".xlsx,.xls" multiple hidden></div>
         <div class="sb" data-k="2"><span class="sl"><i>2</i><em>평어 만들기</em></span><button class="btn primary" id="genBtn"><svg><use href="#i-play"/></svg>평어 만들기</button></div>
-        <div class="sb" data-k="3"><span class="sl"><i>3</i><em>복사해 나이스에</em></span><button class="btn" id="copyAll" title="번호와 평어를 표 모양으로 복사해요. 엑셀이나 한글 표에 붙이면 두 칸으로 들어가요"><svg><use href="#i-copy"/></svg>이 과목 평어 복사</button></div>
+        <div class="sb" data-k="3"><span class="sl"><i>3</i><em>복사해 나이스에</em></span><button class="btn" id="copyAll" title="평어만 번호 차례로 한 줄씩 복사해요. 나이스 학기말종합의견의 첫 학생 칸에 붙여 넣으세요 (평어가 없는 번호는 건너뜀)"><svg><use href="#i-copy"/></svg>이 과목 평어 복사</button></div>
         <button class="btn ghost small" id="resetBtn" title="이 과목의 ◎○△와 평어를 비워요"><svg><use href="#i-reset"/></svg>초기화</button>
       </div>
       <div class="focus" id="focus"></div>
@@ -550,7 +562,7 @@ body.scrolled .appbar{position:relative}
 
     <div class="more">
       <details class="std panel" id="stdBox"><summary>이 과목 성취기준·평가기준 보기</summary><div class="stdlist" id="stdList"></div></details>
-      <details class="std panel" id="howBox"><summary>쓰는 법 자세히</summary><div class="howlist"><div><b class="n">1</b><div><h4>◎○△ 넣기</h4><p>번호마다 성취기준별 ◎○△를 누르거나, 맨 위 <b>전체</b> 줄로 반 전체를 한 번에 채운 뒤 다른 학생만 바꿔요. 나이스에서 내려받은 [교과평가(교과별)] 엑셀을 <b>나이스 파일 넣기</b>로 넣어도 돼요. 과목별 파일을 <b>여러 개 한꺼번에</b> 고르거나 화면에 끌어다 놓으면 과목마다(전담은 반마다) 알아서 채워요. 파일 이름은 바꾸지 않아도 돼요. 파일 안의 학년·반 제목과 성취기준 문장으로 알아봐요.</p></div></div><div><b class="n">2</b><div><h4>평어 만들기</h4><p>번호 차례로 성취기준을 고르고 문장을 써요. 성취기준이 3개보다 많은 과목은 학생마다 3개만 골라 3문장으로 쓰고, 반 안에서 영역이 고르게 돌아가요. 마음에 안 들면 <b>다른 문장</b>.</p></div></div><div><b class="n">3</b><div><h4>나이스에 넣기</h4><p>번호 옆 <b>복사</b>로 한 명씩, <b>이 과목 평어 복사</b>로 반 전체(번호·평어 두 칸)를 복사해요. 나이스 <b>학기말 종합의견</b>에 붙여 넣고 2학기에 체크한 뒤 일괄저장하세요. 교과학습발달상황에 바로 넣으면 2학기 성적이 빠진 것으로 나와요. 바이트는 나이스 방식(한글 3, 영문·숫자·공백 1)으로 셌어요.</p></div></div></div></details>
+      <details class="std panel" id="howBox"><summary>쓰는 법 자세히</summary><div class="howlist"><div><b class="n">1</b><div><h4>◎○△ 넣기</h4><p>번호마다 성취기준별 ◎○△를 누르거나, 맨 위 <b>전체</b> 줄로 반 전체를 한 번에 채운 뒤 다른 학생만 바꿔요. 나이스에서 내려받은 [교과평가(교과별)] 엑셀을 <b>나이스 파일 넣기</b>로 넣어도 돼요. 과목별 파일을 <b>여러 개 한꺼번에</b> 고르거나 화면에 끌어다 놓으면 과목마다(전담은 반마다) 알아서 채워요. 파일 이름은 바꾸지 않아도 돼요. 파일 안의 학년·반 제목과 성취기준 문장으로 알아봐요.</p></div></div><div><b class="n">2</b><div><h4>평어 만들기</h4><p>한 번 누르면 ◎○△가 들어간 과목을 모두 만들어요(담임). 번호 차례로 성취기준을 고르고 문장을 써요. 성취기준이 2개보다 많은 과목은 학생마다 2개만 골라 2문장으로 쓰고, 반 안에서 영역이 고르게 돌아가요. 학생 칸을 눌러 직접 고르면 고른 것 + 자동 1개로 늘 2문장이에요. 마음에 안 들면 <b>다른 문장</b>.</p></div></div><div><b class="n">3</b><div><h4>나이스에 넣기</h4><p>번호 옆 <b>복사</b>로 한 명씩, <b>이 과목 평어 복사</b>로 반 전체 평어를 번호 차례로 한 줄씩 복사해요. 나이스 성적 › 학생평가 › <b>학기말종합의견</b>에서 학기 2·과목을 고르고 조회한 뒤 첫 학생의 학기말 종합의견 칸에 붙여 넣고 저장하세요. 교과학습발달상황은 따로 입력하는 곳이 아니라 학기말종합의견을 모아 보여 주는 화면이에요. 생기부 기재요령은 AI로 만든 문장을 그대로 넣지 말라고 하니, 붙이기 전에 학생마다 읽고 고쳐 주세요. 바이트는 나이스 방식(한글 3, 영문·숫자·공백 1)으로 셌어요.</p></div></div></div></details>
     </div>
 
     <div class="scroll panel"><table class="g" id="grid"></table></div>
@@ -571,14 +583,14 @@ body.scrolled .appbar{position:relative}
 <div class="toast" id="toast"></div>
 
 <script>
-const DATA_V = 3;   // 데이터를 바꾸면 올린다
+const DATA_V = 4;   // 데이터를 바꾸면 올린다
 let D = null, G = 6, KEY = '';
 let ME = {mode:'담임'};   // 선생님 설정: {mode:'담임'|'전담', g, cls, num, subj, classes}
 try { ME = JSON.parse(localStorage.getItem('pyeongeo-me')) || ME; } catch(e) {}
 function saveMe(){ try{ localStorage.setItem('pyeongeo-me', JSON.stringify(ME)); }catch(e){} }
 const keyOf = (g,c) => `pyeongeo-g${g}-c${c}`;
 const LV = ['◎','○','△'];
-const MAXS = 3;   // 학생마다 평어에 넣는 성취기준 수 (11/19 사용자: 과목당 3문장)
+const MAXS = 2;   // 학생마다 평어에 넣는 성취기준 수 (11/27 사용자: 과목당 2문장. 11/19엔 3문장)
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -589,6 +601,7 @@ function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show');
 const subj = () => D.subjects.find(s => s.name===S.subj) || D.subjects[0];
 function marks(n){ const s=subj(); S.marks[s.name] ||= {}; const m = S.marks[s.name][n] ||= []; while(m.length<s.items.length) m.push(-1); return m; }
 function ownOf(n){ const s=subj(); return (((S.own||{})[s.name]||{})[n]||[]).filter(i=>i<s.items.length); }
+function ownEff(n){ const m=marks(n); return ownOf(n).filter(i=>m[i]>=0).slice(-MAXS); }  // 평어에 실제로 들어가는 직접 고른 것 (나중에 고른 MAXS개)
 function saltOf(n){ return ((S.salt[subj().name]||{})[n])||0; }
 
 /* ---- 섞기 (반·과목마다 같은 결과) ---- */
@@ -600,13 +613,15 @@ function perm(n, key){ const r=rng(hash(key)); const a=[...Array(n).keys()]; for
 function focusOf(){ const s=subj(); return ((S.focus||{})[s.name]||[]).filter(i=>i<s.items.length); }
 function chosen(n){
   const s=subj(), K=s.items.length, m=marks(n), F=focusOf();
-  const own=ownOf(n).filter(i=>m[i]>=0);   // 선생님이 이 학생에게 직접 고른 성취기준이 있으면 그것만
-  if(own.length) return own.sort((a,b)=>a-b);
-  const marked=[...Array(K).keys()].filter(i=>m[i]>=0 && (!F.length || F.includes(i)));
-  if(marked.length<=MAXS) return marked;
-  const p=perm(K, `${S.cls}|${s.name}|sub`), start=((n-1)*MAXS + saltOf(n)) % K, out=[];
-  for(let k=0;k<K && out.length<MAXS;k++){ const i=p[(start+k)%K]; if(marked.includes(i)) out.push(i); }
-  return out.sort((a,b)=>a-b);
+  const own=ownEff(n);   // 선생님이 직접 고른 것은 꼭 넣고, 남는 자리만 자동으로 채움 (11/27 사용자: 하나 고르면 자동 하나는 남게)
+  const marked=[...Array(K).keys()].filter(i=>m[i]>=0 && (!F.length || F.includes(i)) && !own.includes(i));
+  const need=MAXS-own.length; let out=[];
+  if(need>0){
+    if(marked.length<=need) out=marked;
+    else { const p=perm(K, `${S.cls}|${s.name}|sub`), start=((n-1)*MAXS + saltOf(n)) % K;
+      for(let k=0;k<K && out.length<need;k++){ const i=p[(start+k)%K]; if(marked.includes(i)) out.push(i); } }
+  }
+  return [...own, ...out].sort((a,b)=>a-b);
 }
 
 /* ---- 문장 배정: 같은 성취기준·수준끼리 돌려 쓰고, 평어 전체는 반 안에서 겹치지 않게 ---- */
@@ -672,9 +687,9 @@ function textOf(n, pick){
   return chosen(n).map(i => s.items[i].v[m[i]][pick[n][i]]).join(' ');
 }
 // 자동으로 고른 성취기준: 직접 고른 게 없고, ◎○△ 있는 것 중 일부만 들어갈 때 (전부 들어가면 표시 안 함)
-function autoOf(n){ const s=subj(), m=marks(n); if(ownOf(n).some(i=>m[i]>=0)) return []; const ch=chosen(n), mk=m.slice(0,s.items.length).filter(x=>x>=0).length; return ch.length && ch.length<mk ? ch : []; }
-function ownTag(n){ const s=subj(), m=marks(n), o=ownOf(n).filter(i=>m[i]>=0).sort((a,b)=>a-b), a=autoOf(n); const L=x=>x.map(i=>esc(s.items[i].code)).join('·');
-  return o.length?` · <span class="own"><i></i>고름: ${L(o)}</span>`:(a.length?` · <span class="own auto"><i></i>자동: ${L(a)}</span>`:''); }
+function autoOf(n){ const s=subj(), m=marks(n), o=ownEff(n), ch=chosen(n), mk=m.slice(0,s.items.length).filter(x=>x>=0).length; return ch.length && ch.length<mk ? ch.filter(i=>!o.includes(i)) : []; }
+function ownTag(n){ const s=subj(), m=marks(n), o=ownEff(n).sort((a,b)=>a-b), a=autoOf(n); const L=x=>x.map(i=>esc(s.items[i].code)).join('·');
+  return (o.length?` · <span class="own"><i></i>고름: ${L(o)}</span>`:'')+(a.length?` · <span class="own auto"><i></i>자동: ${L(a)}</span>`:''); }
 function neisBytes(t){ let b=0; for(const ch of t){ b += ch==='\n'?2:(ch.charCodeAt(0)<128?1:3); } return b; }
 
 /* ---- 그리기 ---- */
@@ -683,7 +698,8 @@ function renderTabs(){
   $('tabs').innerHTML = D.subjects.map(s => {
     const all = S.marks[s.name] || {}; let done=0;
     for(let n=1;n<=S.num;n++){ const m=all[n]; if(m && m.length>=s.items.length && m.slice(0,s.items.length).every(x=>x>=0)) done++; }
-    return `<button class="tab ${s.name===S.subj?'on':''}" data-s="${esc(s.name)}">${esc(s.name)}<span class="cnt">${done}/${S.num}</span><span class="pbar"><i style="width:${Math.round(done/S.num*100)}%"></i></span></button>`;
+    const g=!!(S.gen&&S.gen[s.name]);
+    return `<button class="tab ${s.name===S.subj?'on':''}" data-s="${esc(s.name)}" title="${g?'평어 만듦':''}">${esc(s.name)}<span class="cnt">${done}/${S.num}${g?' ✓':''}</span><span class="pbar"><i style="width:${Math.round(done/S.num*100)}%"></i></span></button>`;
   }).join('');
   $('tabs').querySelectorAll('[data-s]').forEach(b => b.onclick = () => { S.subj=b.dataset.s; save(); render(); });
 }
@@ -700,11 +716,11 @@ function render(){
   const ready = gen && !running;
   const s=subj(), N=S.num, {pick, use}=assign();
   let h = `<thead><tr><th>번호</th>${s.items.map(it=>`<th class="code" title="${esc(it.std)}">${esc(it.code)}<span>${esc(it.area)}</span></th>`).join('')}<th style="text-align:left">평어</th><th></th></tr></thead><tbody>`;
-  h += `<tr class="all"><td class="no">전체</td>${s.items.map((it,i)=>`<td class="lv" data-c="${esc(it.code)}">${segHTML(-1,`data-all="${i}"`)}</td>`).join('')}<td class="txt">누르면 그 성취기준을 반 전체에 넣어요. 대부분 ○로 채우고 다른 학생만 바꾸면 빨라요. 학생 칸의 빈 곳을 누르면 그 학생 평어에 넣을 성취기준을 고를 수 있어요 (최대 ${MAXS}개).</td><td></td></tr>`;
+  h += `<tr class="all"><td class="no">전체</td>${s.items.map((it,i)=>`<td class="lv" data-c="${esc(it.code)}">${segHTML(-1,`data-all="${i}"`)}</td>`).join('')}<td class="txt">누르면 그 성취기준을 반 전체에 넣어요. 대부분 ○로 채우고 다른 학생만 바꾸면 빨라요. 학생 칸의 빈 곳을 누르면 그 학생 평어에 꼭 넣을 성취기준을 고를 수 있어요. 남는 자리는 자동으로 채워 늘 ${MAXS}문장이에요.</td><td></td></tr>`;
   for(let n=1;n<=N;n++){
-    const m=marks(n), t=textOf(n,pick), miss=m.filter(x=>x<0).length, own=ownOf(n).filter(i=>m[i]>=0), au=autoOf(n);
+    const m=marks(n), t=textOf(n,pick), miss=m.filter(x=>x<0).length, own=ownEff(n), au=autoOf(n);
     const show = gen && t;
-    h += `<tr data-r="${n}" class="${gen&&!t?'skip':''}"><td class="no">${n}</td>${s.items.map((it,i)=>`<td class="lv${own.includes(i)?' own':(au.includes(i)?' auto':'')}" data-c="${esc(it.code)}" data-on="${n}" data-oi="${i}" title="빈 곳을 누르면 이 학생 평어에 넣을 성취기준으로 골라요 (최대 ${MAXS}개)">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
+    h += `<tr data-r="${n}" class="${gen&&!t?'skip':''}"><td class="no">${n}</td>${s.items.map((it,i)=>`<td class="lv${own.includes(i)?' own':(au.includes(i)?' auto':'')}" data-c="${esc(it.code)}" data-on="${n}" data-oi="${i}" title="빈 곳을 누르면 이 학생 평어에 꼭 넣을 성취기준으로 골라요 (${MAXS}개 넘으면 먼저 고른 것이 빠져요)">${segHTML(m[i],`data-n="${n}" data-i="${i}"`)}</td>`).join('')}
       <td class="txt">${show?`<div class="t">${esc(t)}</div><div class="meta">${t.length}자 · ${neisBytes(t)}바이트${ownTag(n)}${miss?` · <span class="w">${miss}개 안 고름</span>`:''}</div>`:(gen&&!t ? `<div class="t skip">◎○△가 없어 건너뛰었어요</div>` : `<div class="t ${t?'wait':'empty'}">${t?'평어 만들기를 누르면 나와요':'◎○△를 누르세요'}</div>`)}</td>
       <td class="act">${show?`<span class="rowact"><button data-alt="${n}" title="같은 ◎○△로 다른 문장"><svg><use href="#i-reset"/></svg>다른 문장</button><button data-copy="${n}" title="이 학생 평어 복사"><svg><use href="#i-copy"/></svg>복사</button></span>`:''}</td></tr>`;
   }
@@ -716,7 +732,8 @@ function render(){
   $('status').innerHTML = `${filled}명 입력` + (skipN && filled ? ` · <span class="w">${skipN}명 빠짐</span>` : '') + (ready&&filled>1?' · 반 안에서 평어가 모두 달라요':'');
   const fl=$('flow').querySelectorAll('.sb'), stage = ready ? 3 : (filled ? 2 : 1);
   [...fl].forEach((li,k)=>{ li.classList.toggle('now', k+1===stage); li.classList.toggle('done', k+1<stage); });
-  $('genBtn').innerHTML = ready ? '<svg><use href="#i-reset"/></svg>다시 만들기' : '<svg><use href="#i-play"/></svg>평어 만들기';
+  const allTxt = ME.mode==='전담' ? '' : ' (전 과목)';
+  $('genBtn').innerHTML = ready ? `<svg><use href="#i-reset"/></svg>다시 만들기${allTxt}` : `<svg><use href="#i-play"/></svg>평어 만들기${allTxt}`;
   $('genBtn').disabled = !filled || !!running; $('copyAll').disabled = !ready;
   $('genBtn').classList.toggle('primary', !ready); $('copyAll').classList.toggle('primary', ready);
   $('subjName').textContent = ME.mode==='전담' ? `${G}학년 ${S.cls}반 ${s.name}` : s.name;
@@ -734,7 +751,7 @@ function bind(pick){
     const n=+td.dataset.on, i=+td.dataset.oi;
     S.own ||= {}; const all = S.own[s.name] ||= {}; const cur = ownOf(n);
     if(cur.includes(i)) all[n] = cur.filter(x=>x!==i);
-    else if(cur.length>=MAXS){ toast(`한 학생에 성취기준은 최대 ${MAXS}개예요. 하나를 먼저 풀어 주세요`); return; }
+    else if(cur.length>=MAXS){ all[n] = [...cur.slice(cur.length-MAXS+1), i]; toast(`${n}번: 먼저 고른 ${cur.slice(0,cur.length-MAXS+1).map(x=>s.items[x].code).join('·')}를 빼고 ${s.items[i].code}를 넣었어요`); }
     else all[n] = [...cur, i];
     if(!all[n].length) delete all[n];
     if(marks(n)[i]<0 && !cur.includes(i)) toast(`${n}번 ${s.items[i].code}는 ◎○△가 없어서 평어에 안 들어가요`);
@@ -944,7 +961,11 @@ let running = null;
 const wait = ms => new Promise(r => setTimeout(r, ms));
 async function generate(){
   if(running) return;
-  const s=subj(); S.gen ||= {}; S.gen[s.name]=true; save();
+  const s=subj(); S.gen ||= {}; S.gen[s.name]=true;
+  // 담임: 한 번 누르면 ◎○△가 들어간 과목 전부 만든다 (11/27 사용자). 연출은 지금 과목만
+  const others = ME.mode==='전담' ? [] : D.subjects.filter(x => x.name!==s.name && Object.values((S.marks||{})[x.name]||{}).some(m => (m||[]).some(v => v>=0)));
+  others.forEach(x => S.gen[x.name]=true);
+  save();
   const {pick}=assign();
   const token = running = {skip:false};
   render();
@@ -981,14 +1002,16 @@ async function generate(){
   $('progFill').style.width='100%'; $('progTxt').textContent=`${rows.length}명 평어 완성!`;
   await wait(fast()?200:350);
   $('prog').hidden=true; running=null;
-  render(); toast(`${s.name} ${rows.length}명 평어를 만들었어요`);
+  render(); toast(others.length ? `${others.length+1}과목 평어를 모두 만들었어요. 과목 탭을 눌러 보세요` : `${s.name} ${rows.length}명 평어를 만들었어요`);
 }
 $('genBtn').onclick = generate;
 new IntersectionObserver(([e]) => { const down = !e.isIntersecting && e.boundingClientRect.top < 0; document.body.classList.toggle('scrolled', down); $('tool').classList.toggle('compact', down && innerWidth>720); }, {rootMargin:`-${58+12}px 0px 0px 0px`}).observe($('toolSentinel'));
 new ResizeObserver(() => document.documentElement.style.setProperty('--toolh', $('tool').offsetHeight + 'px')).observe($('tool'));
+new ResizeObserver(() => document.documentElement.style.setProperty('--tabsh', $('tabs').offsetHeight + 'px')).observe($('tabs'));
 $('numIn').onchange = e => { if(running){ e.target.value=S.num; return; } S.num=Math.max(1,Math.min(40,+e.target.value||S.num)); if(S.gen) S.gen={}; save(); render(); };
 $('skipBtn').onclick = () => { if(running) running.skip=true; };
-$('copyAll').onclick = () => { const {pick}=assign(); const L=[`번호\t${S.subj} 평어`]; for(let n=1;n<=S.num;n++){ const t=textOf(n,pick); if(t) L.push(`${n}\t${t}`); } copy(L.join('\n'), `${S.subj} 평어 ${L.length-1}명을 복사했어요. 엑셀·한글 표에 붙이면 번호와 평어가 두 칸으로 들어가요`); };
+// 나이스 [학기말종합의견] 화면은 반/번호·성명이 이미 줄마다 있어서 평어 칸만 붙이면 된다 (11/27 나이스 화면 확인). 평어만 번호 차례로 한 줄씩
+$('copyAll').onclick = () => { const {pick}=assign(); const L=[], nos=[]; for(let n=1;n<=S.num;n++){ const t=textOf(n,pick); if(t){ L.push(t); nos.push(n); } } copy(L.join('\n'), `${S.subj} 평어 ${L.length}명(${nos[0]}~${nos[nos.length-1]}번, 빈 번호 건너뜀)을 복사했어요. 나이스 학기말종합의견에서 첫 학생 칸을 누르고 붙여 넣으세요`); };
 
 /* ---- 학년 고르기: 학년마다 데이터 파일·저장을 따로 ---- */
 function loadData(g){
